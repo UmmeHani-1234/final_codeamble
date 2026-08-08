@@ -9,6 +9,80 @@ const NotificationUser      = require('../models/NotificationUser');
 const RegionalRisk          = require('../models/RegionalRisk');
 const RiskSnapshot          = require('../models/RiskSnapshot');
 const Notification          = require('../models/Notification');
+// Twilio client (optional) — only initialised when env vars are present
+const TWILIO_ACCOUNT_SID = process.env.TWILIO_ACCOUNT_SID;
+const TWILIO_AUTH_TOKEN = process.env.TWILIO_AUTH_TOKEN;
+const TWILIO_PHONE_NUMBER = process.env.TWILIO_PHONE_NUMBER;
+let twilioClient = null;
+if (TWILIO_ACCOUNT_SID && TWILIO_AUTH_TOKEN) {
+  try {
+    twilioClient = require('twilio')(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN);
+  } catch (err) {
+    console.error('Twilio client init failed', err);
+    twilioClient = null;
+  }
+}
+
+async function trySendSms(to, body) {
+  if (!twilioClient) return null;
+  if (!to) return null;
+  try {
+    const msg = await twilioClient.messages.create({
+      body,
+      from: TWILIO_PHONE_NUMBER,
+      to,
+    });
+    return msg;
+  } catch (err) {
+    console.error('Twilio send error', err);
+    return null;
+  }
+}
+
+// Nodemailer transporter (optional) — initialise when SMTP env vars are present
+let transporter = null;
+if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
+  try {
+    const nodemailer = require('nodemailer');
+    transporter = nodemailer.createTransport({
+      host: process.env.SMTP_HOST,
+      port: Number(process.env.SMTP_PORT) || 587,
+      secure: (process.env.SMTP_SECURE === 'true'),
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS,
+      },
+    });
+  } catch (err) {
+    console.error('Nodemailer init failed', err);
+    transporter = null;
+  }
+}
+
+async function trySendEmail(to, subject, text) {
+  if (!transporter) return null;
+  if (!to) return null;
+  try {
+    const info = await transporter.sendMail({
+      from: process.env.EMAIL_FROM || process.env.SMTP_USER,
+      to,
+      subject,
+      text,
+    });
+    // Try to get a preview URL (Ethereal) when available
+    let preview = null;
+    try {
+      const nodemailer = require('nodemailer');
+      preview = nodemailer.getTestMessageUrl(info) || null;
+    } catch (err) {
+      preview = null;
+    }
+    return { info, preview };
+  } catch (err) {
+    console.error('Email send error', err);
+    return null;
+  }
+}
 
 // ─── GET /api/hospital/me ─────────────────────────────────────────────────────
 // Current hospital profile
@@ -165,6 +239,7 @@ router.get('/notifications', hospitalAuth, async (req, res) => {
 router.post('/notifications/send', hospitalAuth, async (req, res) => {
   try {
     const { recipientId, recipientType, recipientName, recipientEmail, message, channel, patientRecipients } = req.body;
+    const hospitalProfile = await Hospital.findById(req.hospital.id).select('email name');
     if (!message) return res.status(400).json({ msg: 'message required' });
 
     if (recipientType === 'all_patients') {
@@ -176,6 +251,7 @@ router.post('/notifications/send', hospitalAuth, async (req, res) => {
         return res.status(400).json({ msg: 'No registered patients were provided' });
       }
 
+      // Create notifications with queued status, then attempt to send via Twilio
       const created = await Promise.all(recipients.map((patient) =>
         Notification.create({
           hospitalId: req.hospital.id,
@@ -184,10 +260,49 @@ router.post('/notifications/send', hospitalAuth, async (req, res) => {
           recipientEmail: patient.email || '',
           message,
           channel: channel || 'sms',
-          status: 'sent',
-          sentAt: new Date(),
+          status: 'queued',
+          sentAt: null,
         })
       ));
+
+      // Attempt to send SMS for each created notification when possible
+      if (twilioClient && (channel || 'sms') === 'sms') {
+        await Promise.all(created.map(async (n, idx) => {
+          const patient = recipients[idx];
+          const to = (patient && (patient.phone || patient.mobile || patient.msisdn)) || null;
+          if (!to) {
+            await Notification.findByIdAndUpdate(n._id, { status: 'failed' });
+            return;
+          }
+          const resMsg = await trySendSms(to, message);
+          if (resMsg && resMsg.sid) {
+            await Notification.findByIdAndUpdate(n._id, { status: 'sent', sentAt: new Date(), twilioSid: resMsg.sid });
+            // Send a copy to the hospital's registered email (if configured) and persist email metadata
+            if (hospitalProfile && hospitalProfile.email) {
+              const emailBody = `SMS to ${patient.name || 'patient'} (${to}):\n\n${message}`;
+              const emailResult = await trySendEmail(hospitalProfile.email, `Notification sent — ${hospitalProfile.name}`, emailBody);
+              if (emailResult && emailResult.info) {
+                await Notification.findByIdAndUpdate(n._id, {
+                  emailMessageId: emailResult.info.messageId || '',
+                  emailPreviewUrl: emailResult.preview || '',
+                });
+              }
+            }
+          } else {
+            await Notification.findByIdAndUpdate(n._id, { status: 'failed' });
+            if (hospitalProfile && hospitalProfile.email) {
+              const emailBody = `Failed SMS to ${patient.name || 'patient'} (${to}). Message:\n\n${message}`;
+              const emailResult = await trySendEmail(hospitalProfile.email, `Notification failed — ${hospitalProfile.name}`, emailBody);
+              if (emailResult && emailResult.info) {
+                await Notification.findByIdAndUpdate(n._id, {
+                  emailMessageId: emailResult.info.messageId || '',
+                  emailPreviewUrl: emailResult.preview || '',
+                });
+              }
+            }
+          }
+        }));
+      }
 
       return res.status(201).json({ sentCount: created.length, notifications: created });
     }
@@ -196,8 +311,8 @@ router.post('/notifications/send', hospitalAuth, async (req, res) => {
       hospitalId: req.hospital.id,
       message,
       channel: channel || 'sms',
-      status: 'sent',
-      sentAt: new Date(),
+      status: 'queued',
+      sentAt: null,
     };
 
     if (recipientType === 'patient') {
@@ -216,6 +331,62 @@ router.post('/notifications/send', hospitalAuth, async (req, res) => {
     }
 
     const notif = await Notification.create(notifPayload);
+
+    // If SMS channel and Twilio configured, attempt to send immediately
+    if (notif.channel === 'sms' && twilioClient) {
+      let to = null;
+      if (recipientType === 'patient') {
+        to = req.body.recipientPhone || req.body.recipientPhoneNumber || req.body.recipientMobile || null;
+      } else if (recipientType === 'staff' || recipientType === 'user' || recipientType === 'notification_user') {
+        // recipientId was set above and recipient fetched
+        const r = await NotificationUser.findById(notif.recipientId);
+        to = r ? (r.phone || null) : null;
+      }
+
+      if (to) {
+        const result = await trySendSms(to, message);
+        if (result && result.sid) {
+          notif.status = 'sent';
+          notif.sentAt = new Date();
+          notif.twilioSid = result.sid;
+          await notif.save();
+          if (hospitalProfile && hospitalProfile.email) {
+            const emailBody = `SMS to ${notif.recipientName || 'recipient'} (${to}):\n\n${message}`;
+            const emailResult = await trySendEmail(hospitalProfile.email, `Notification sent — ${hospitalProfile.name}`, emailBody);
+            if (emailResult && emailResult.info) {
+              notif.emailMessageId = emailResult.info.messageId || '';
+              notif.emailPreviewUrl = emailResult.preview || '';
+              await notif.save();
+            }
+          }
+        } else {
+          notif.status = 'failed';
+          await notif.save();
+          if (hospitalProfile && hospitalProfile.email) {
+            const emailBody = `Failed SMS to ${notif.recipientName || 'recipient'} (${to}):\n\n${message}`;
+            const emailResult = await trySendEmail(hospitalProfile.email, `Notification failed — ${hospitalProfile.name}`, emailBody);
+            if (emailResult && emailResult.info) {
+              notif.emailMessageId = emailResult.info.messageId || '';
+              notif.emailPreviewUrl = emailResult.preview || '';
+              await notif.save();
+            }
+          }
+        }
+      } else {
+        notif.status = 'failed';
+        await notif.save();
+        if (hospitalProfile && hospitalProfile.email) {
+          const emailBody = `No phone number provided for recipient ${notif.recipientName || 'recipient'} when attempting SMS. Message:\n\n${message}`;
+          const emailResult = await trySendEmail(hospitalProfile.email, `Notification failed — ${hospitalProfile.name}`, emailBody);
+          if (emailResult && emailResult.info) {
+            notif.emailMessageId = emailResult.info.messageId || '';
+            notif.emailPreviewUrl = emailResult.preview || '';
+            await notif.save();
+          }
+        }
+      }
+    }
+
     res.status(201).json(notif);
   } catch (e) { res.status(500).json({ msg: 'Server error' }); }
 });

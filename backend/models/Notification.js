@@ -60,6 +60,11 @@ const notificationSchema = new mongoose.Schema({
 
   // Timestamp when the notification was actually dispatched
   sentAt: { type: Date, default: null },
+  // Twilio message SID (if sent via Twilio)
+  twilioSid: { type: String, trim: true, default: '' },
+  // Email delivery metadata
+  emailMessageId: { type: String, trim: true, default: '' },
+  emailPreviewUrl: { type: String, trim: true, default: '' },
 }, { timestamps: true });
 
 notificationSchema.index({ hospitalId: 1, createdAt: -1 });
