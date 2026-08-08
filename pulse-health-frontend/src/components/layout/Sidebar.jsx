@@ -3,9 +3,9 @@ import { Activity, LogOut } from "lucide-react";
 
 export default function Sidebar({ items, roleLabel, roleIcon: RoleIcon, basePath, onLogout, systemStatus }) {
   return (
-    <aside className="fixed left-0 top-0 h-[100vh] w-[240px] flex-shrink-0 bg-white border-r border-slate-200 flex flex-col px-4 py-5 overflow-hidden z-40">
+    <aside className="h-full min-h-[calc(100vh-120px)] w-full max-w-[280px] flex-shrink-0 rounded-[28px] border border-slate-200/70 bg-white/90 shadow-sm p-5 backdrop-blur-sm flex flex-col overflow-hidden">
       <div className="flex items-center gap-3 px-1 pb-5">
-        <span className="w-11 h-11 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center shadow-sm">
+        <span className="w-11 h-11 rounded-2xl bg-brand-tint text-brand flex items-center justify-center shadow-sm">
           <Activity size={18} />
         </span>
         <div>
@@ -32,13 +32,13 @@ export default function Sidebar({ items, roleLabel, roleIcon: RoleIcon, basePath
         </nav>
       </div>
 
-      <div className="mt-4 border-t border-slate-200 pt-4">
+      <div className="mt-4 border-t border-slate-200/70 pt-4">
         <div className="flex items-center gap-3 px-1 mb-4">
           <span className="w-10 h-10 rounded-2xl bg-slate-100 text-slate-700 flex items-center justify-center">
             <RoleIcon size={16} />
           </span>
           <div className="min-w-0">
-            <div className="text-sm font-semibold text-slate-900 truncate">{roleLabel}</div>
+            <div className="text-[13.5px] font-semibold text-slate-900 truncate">{roleLabel}</div>
             <div className="text-[12px] text-slate-500 truncate">Hospital profile</div>
           </div>
         </div>

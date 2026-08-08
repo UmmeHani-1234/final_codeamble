@@ -13,6 +13,7 @@ export default function HospitalAlerts() {
       <EmptyState
         title="No alerts for your hospital"
         sub={`${currentHospital?.name || "Your hospital"} has no active surveillance signals right now.`}
+        tone="success"
       />
     );
   }

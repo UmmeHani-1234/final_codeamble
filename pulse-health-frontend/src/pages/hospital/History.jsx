@@ -5,6 +5,7 @@ export default function History() {
   return (
     <EmptyState
       icon={Clock}
+      tone="neutral"
       title="No history yet"
       sub="Past submissions and resolved alerts for your hospital will appear here once you've been reporting for a while."
     />

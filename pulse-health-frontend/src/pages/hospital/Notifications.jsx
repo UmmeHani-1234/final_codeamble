@@ -27,7 +27,7 @@ export default function Notifications() {
       <div className="card">
         <div className="flex items-center justify-between gap-4 mb-2.5">
           <div>
-            <span className="eyebrow">Hospital notification recipients</span>
+            <span className="eyebrow text-warning/70">Hospital notification recipients</span>
             <p className="text-muted text-[13px] mt-1">
               Send alerts directly to your hospital's response team.
             </p>
@@ -56,12 +56,12 @@ export default function Notifications() {
               </tr>
             ) : (
               recipients.map((user) => (
-                <tr key={user.id} className="table-row-hover">
+                <tr key={user.id} className="table-row-hover table-row-hover-info">
                   <td className="py-3 border-t border-line">{user.name}</td>
                   <td className="py-3 border-t border-line">{user.role}</td>
                   <td className="py-3 border-t border-line text-muted">{user.email}</td>
                   <td className="py-3 border-t border-line">
-                    <button className="btn-secondary">Send notification</button>
+                    <button className="btn-info">Send notification</button>
                   </td>
                 </tr>
               ))

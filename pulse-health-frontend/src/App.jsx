@@ -1,33 +1,32 @@
+import { lazy, Suspense } from "react";
 import { Routes, Route } from "react-router-dom";
 import { Home as HomeIcon, AlertTriangle, ClipboardList, Clock, Bell, Settings, MapPin, Building2, ShieldCheck, Users, Upload, BarChart3 } from "lucide-react";
 import { useAuth } from "./context/AuthContext.jsx";
 
-import Home from "./pages/public/Home.jsx";
-import Login from "./pages/public/Login.jsx";
-import RegisterHospital from "./pages/public/RegisterHospital.jsx";
-
 import ProtectedRoute from "./routes/ProtectedRoute.jsx";
 import DashboardLayout from "./components/layout/DashboardLayout.jsx";
 
-import HospitalOverview from "./pages/hospital/Overview.jsx";
-import HospitalAlerts from "./pages/hospital/Alerts.jsx";
-import HospitalAlertDetail from "./pages/hospital/AlertDetail.jsx";
-import HospitalRegional from "./pages/hospital/Regional.jsx";
-import HospitalSurveillance from "./pages/hospital/Surveillance.jsx";
-import HospitalSubmitData from "./pages/hospital/SubmitData.jsx";
-import HospitalHistory from "./pages/hospital/History.jsx";
-import HospitalRegisteredUsers from "./pages/hospital/RegisteredUsers.jsx";
-import HospitalNotifications from "./pages/hospital/Notifications.jsx";
-import HospitalRiskHistory from "./pages/hospital/RiskHistory.jsx";
-import HospitalSettings from "./pages/hospital/Settings.jsx";
-
-import AdminOverview from "./pages/admin/Overview.jsx";
-import AdminAlerts from "./pages/admin/Alerts.jsx";
-import AdminRegional from "./pages/admin/Regional.jsx";
-import AdminOrganizations from "./pages/admin/Organizations.jsx";
-import AdminHistory from "./pages/admin/History.jsx";
-import AdminNotifications from "./pages/admin/Notifications.jsx";
-import AdminSettings from "./pages/admin/Settings.jsx";
+const Home = lazy(() => import("./pages/public/Home.jsx"));
+const Login = lazy(() => import("./pages/public/Login.jsx"));
+const RegisterHospital = lazy(() => import("./pages/public/RegisterHospital.jsx"));
+const HospitalOverview = lazy(() => import("./pages/hospital/Overview.jsx"));
+const HospitalAlerts = lazy(() => import("./pages/hospital/Alerts.jsx"));
+const HospitalAlertDetail = lazy(() => import("./pages/hospital/AlertDetail.jsx"));
+const HospitalRegional = lazy(() => import("./pages/hospital/Regional.jsx"));
+const HospitalSurveillance = lazy(() => import("./pages/hospital/Surveillance.jsx"));
+const HospitalSubmitData = lazy(() => import("./pages/hospital/SubmitData.jsx"));
+const HospitalHistory = lazy(() => import("./pages/hospital/History.jsx"));
+const HospitalRegisteredUsers = lazy(() => import("./pages/hospital/RegisteredUsers.jsx"));
+const HospitalNotifications = lazy(() => import("./pages/hospital/Notifications.jsx"));
+const HospitalRiskHistory = lazy(() => import("./pages/hospital/RiskHistory.jsx"));
+const HospitalSettings = lazy(() => import("./pages/hospital/Settings.jsx"));
+const AdminOverview = lazy(() => import("./pages/admin/Overview.jsx"));
+const AdminAlerts = lazy(() => import("./pages/admin/Alerts.jsx"));
+const AdminRegional = lazy(() => import("./pages/admin/Regional.jsx"));
+const AdminOrganizations = lazy(() => import("./pages/admin/Organizations.jsx"));
+const AdminHistory = lazy(() => import("./pages/admin/History.jsx"));
+const AdminNotifications = lazy(() => import("./pages/admin/Notifications.jsx"));
+const AdminSettings = lazy(() => import("./pages/admin/Settings.jsx"));
 
 const hospitalNav = [
   { key: "", label: "Overview", icon: HomeIcon },
@@ -106,7 +105,8 @@ function AdminDashboardLayout() {
 
 export default function App() {
   return (
-    <Routes>
+    <Suspense fallback={<div className="min-h-screen bg-slate-50" aria-busy="true" />}>
+      <Routes>
       <Route path="/" element={<Home />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<RegisterHospital />} />
@@ -148,6 +148,7 @@ export default function App() {
         <Route path="notifications" element={<AdminNotifications />} />
         <Route path="settings" element={<AdminSettings />} />
       </Route>
-    </Routes>
+      </Routes>
+    </Suspense>
   );
 }

@@ -11,9 +11,11 @@ app.use(cors());
 app.use(express.json());
 
 // Routes
-const authRoutes = require('./routes/auth');
+const hospitalAuthRoutes = require('./routes/hospitalAuth');
+const adminRoutes = require('./routes/admin');
 const metricsRoutes = require('./routes/metrics');
-app.use('/api/auth', authRoutes);
+app.use('/api/hospital', hospitalAuthRoutes);
+app.use('/api/admin', adminRoutes);
 app.use('/api/metrics', metricsRoutes);
 
 // Basic route for testing

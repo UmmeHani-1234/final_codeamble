@@ -50,7 +50,7 @@ export default function History() {
           <div className="icon-chip"><Clock size={18} /></div>
           <div>
             <span className="eyebrow">History & reports</span>
-            <h1 className="font-display text-[22px] mt-2">Generated risk report</h1>
+            <h1 className="font-display text-[22px] mt-2 text-indigo">Generated risk report</h1>
             <p className="text-muted text-[13.5px] mt-2">
               This report is generated from analysis of hospital alert signals, regional risk trends, and city-level activity.
             </p>
@@ -62,7 +62,7 @@ export default function History() {
         {summaryItems.map((item) => (
           <div key={item.label} className="card">
             <div className="text-muted text-[12px] uppercase tracking-wide font-semibold mb-2">{item.label}</div>
-            <div className="font-display text-[24px] font-semibold">{item.value}</div>
+            <div className={"font-display text-[24px] font-semibold " + (item.label === "Leading disease signal" ? "text-danger" : item.label === "Hospitals analyzed" ? "text-success" : "text-indigo")}>{item.value}</div>
             <p className="text-[13px] text-muted mt-3">{item.note}</p>
           </div>
         ))}

@@ -31,9 +31,9 @@ export default function RegisterHospital() {
         </Link>
 
         <div className="mb-6">
-          <p className="text-sm uppercase tracking-[0.32em] text-slate-500">Create hospital account</p>
-          <h1 className="mt-3 text-3xl font-semibold text-slate-900">Register your hospital</h1>
-          <p className="mt-2 text-sm text-slate-500">Launch a hospital dashboard for your facility's alert and submission workflow.</p>
+          <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">Create hospital account</p>
+          <h1 className="mt-3 text-[22px] font-semibold text-slate-900">Register your hospital</h1>
+          <p className="mt-2 text-[13.5px] text-slate-500 leading-6">Launch a hospital dashboard for your facility's alert and submission workflow.</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">

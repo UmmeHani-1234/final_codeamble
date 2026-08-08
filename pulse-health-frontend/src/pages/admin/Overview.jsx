@@ -2,13 +2,11 @@ import {
   Activity, AlertTriangle, Building2, CheckCircle2, Database,
   RadioTower, Clock3, Network, TrendingUp, TrendingDown,
 } from "lucide-react";
-import { BarChart, Bar, Cell, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer } from "recharts";
 import { useAuth } from "../../context/AuthContext.jsx";
 import { regionalRisk, flattenAllAlerts } from "../../data/mockData.js";
-import { RiskBadge, StatusBadge } from "../../components/ui/Badge.jsx";
-
+import { RiskBadge, StatusBadge } from "../../components/ui/Badge.jsx";import { valueTone } from "../../utils/sectionStyles.js";
 const RISK_RING = { High: "#C0324B", Medium: "#AD7A0A", Low: "#1E8E5A" };
-const AVATAR_TINTS = ["bg-brand-tint text-brand", "bg-indigo-tint text-indigo", "bg-success-tint text-success", "bg-warning-tint text-warning"];
+const AVATAR_TINTS = ["bg-brand-tint text-brand", "bg-indigo-tint text-indigo", "bg-success-tint text-success", "bg-warning-tint text-warning", "bg-cyan-tint text-cyan"];
 const TONE = {
   brand: "bg-brand-tint text-brand",
   indigo: "bg-indigo-tint text-indigo",
@@ -16,15 +14,17 @@ const TONE = {
   warning: "bg-warning-tint text-warning",
   success: "bg-success-tint text-success",
 };
+const SURFACE = { brand: "surface-action", indigo: "surface-regional", danger: "surface-risk", warning: "surface-attention", success: "surface-status" };
+const riskSurface = (risk) => risk === "High" ? "surface-risk" : risk === "Medium" ? "surface-attention" : "surface-status";
 
 function avatarTint(name = "") {
   const hash = [...name].reduce((s, c) => s + c.charCodeAt(0), 0);
   return AVATAR_TINTS[hash % AVATAR_TINTS.length];
 }
 
-function KpiCard({ label, value, sub, trend, icon: Icon, tone = "brand" }) {
+function KpiCard({ label, value, sub, trend, icon: Icon, tone = "brand", valueTone = "" }) {
   return (
-    <div className="card !p-[18px]">
+    <div className={"card !p-[18px] " + (SURFACE[tone] || SURFACE.brand)}>
       <div className="flex items-start justify-between">
         <span className="eyebrow">{label}</span>
         {Icon && (
@@ -33,7 +33,7 @@ function KpiCard({ label, value, sub, trend, icon: Icon, tone = "brand" }) {
           </span>
         )}
       </div>
-      <div className="font-display text-[28px] font-semibold mt-2.5">{value}</div>
+      <div className={"font-display text-[28px] font-semibold mt-2.5 " + valueTone}>{value}</div>
       {sub && (
         <div className="flex items-center gap-1 text-[12px] text-muted mt-1.5">
           {trend === "up" && <TrendingUp size={13} className="text-success" />}
@@ -84,11 +84,7 @@ export default function AdminOverview() {
     <div className="flex flex-col gap-5">
       {/* Hero: the single most important thing happening across the network */}
       {topAlert && (
-        <div className="card relative overflow-hidden !p-0">
-          <div
-            className="h-1.5 w-full"
-            style={{ background: `linear-gradient(90deg, ${RISK_RING[topAlert.risk] || "#2554E8"}, #6C5CE7)` }}
-          />
+        <div className={"card relative overflow-hidden !p-0 " + riskSurface(topAlert.risk)}>
           <div className="p-6 flex items-center justify-between gap-6 flex-wrap">
             <div>
               <span className="eyebrow">Highest network priority</span>
@@ -109,38 +105,38 @@ export default function AdminOverview() {
       )}
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <KpiCard label="Organizations" value={hospitals.length} sub="hospitals connected" icon={Building2} tone="indigo" />
-        <KpiCard label="Active alerts" value={allAlerts.length} sub="across the network" icon={AlertTriangle} tone="danger" />
-        <KpiCard label="High priority" value={highPriority} sub="needs attention" icon={Activity} tone="warning" />
-        <KpiCard label="Network health" value={`${avgCompleteness}%`} sub="avg. reporting completeness" trend="up" icon={CheckCircle2} tone="success" />
+        <KpiCard label="Organizations" value={hospitals.length} sub="hospitals connected" icon={Building2} tone="indigo" valueTone={valueTone("Organizations")} />
+        <KpiCard label="Active alerts" value={allAlerts.length} sub="across the network" icon={AlertTriangle} tone="danger" valueTone={valueTone("Active alerts")} />
+        <KpiCard label="High priority" value={highPriority} sub="needs attention" icon={Activity} tone="warning" valueTone={valueTone("High priority")} />
+        <KpiCard label="Network health" value={`${avgCompleteness}%`} sub="avg. reporting completeness" trend="up" icon={CheckCircle2} tone="success" valueTone={valueTone("Network health")} />
       </div>
 
-      <div className="card">
+      <div className="card surface-regional">
         <div className="flex items-center justify-between mb-2.5">
           <span className="eyebrow">Regional risk comparison</span>
           <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-danger-tint text-danger">
             Highest: {regionalRisk.find((r) => r.risk === maxRisk)?.region} · {maxRisk}%
           </span>
         </div>
-        <div className="h-[220px]">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={regionalRisk} barSize={28}>
-              <CartesianGrid stroke="#EEF1F6" vertical={false} />
-              <XAxis dataKey="region" tick={{ fontSize: 11.5, fill: "#5B6472" }} axisLine={false} tickLine={false} />
-              <YAxis hide />
-              <Tooltip contentStyle={{ borderRadius: 12, border: "1px solid #EEF1F6", fontSize: 12 }} />
-              <Bar dataKey="risk" radius={[8, 8, 0, 0]}>
-                {regionalRisk.map((r) => (
-                  <Cell key={r.region} fill={r.risk === maxRisk ? "#2554E8" : "#B9C7F5"} />
-                ))}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
+        <div className="h-[220px] grid grid-cols-[repeat(auto-fit,minmax(44px,1fr))] items-end gap-3 pt-4 border-b border-line">
+          {regionalRisk.map((region) => (
+            <div key={region.region} className="h-full min-w-0 flex flex-col items-center justify-end gap-2">
+              <span className="text-[11px] text-muted font-medium">{region.risk}%</span>
+              <div
+                className="w-full max-w-8 rounded-t-lg transition-[height] duration-500"
+                style={{ height: `${region.risk}%`, background: region.risk === maxRisk ? "#2554E8" : "#B9C7F5" }}
+                title={`${region.region}: ${region.risk}% risk`}
+                aria-label={`${region.region}: ${region.risk}% risk`}
+                role="img"
+              />
+              <span className="w-full truncate text-center text-[11.5px] text-muted">{region.region}</span>
+            </div>
+          ))}
         </div>
       </div>
 
       <div className="grid lg:grid-cols-[1.3fr_1fr] gap-5">
-        <div className="card">
+        <div className="card surface-status">
           <span className="eyebrow">Top priority items — all hospitals</span>
           <table className="w-full border-collapse text-[13px] mt-3.5">
             <thead>

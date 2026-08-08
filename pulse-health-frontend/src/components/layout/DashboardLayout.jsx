@@ -1,23 +1,39 @@
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import Sidebar from "./Sidebar.jsx";
 import TopHeader from "./TopHeader.jsx";
 
 export default function DashboardLayout({ navItems, basePath, roleLabel, roleIcon, avatarLabel, title, onLogout, hospitalStatus }) {
+  const { pathname } = useLocation();
+  const dashboardTone = pathname.includes("alerts") || pathname.includes("risk-history")
+    ? "risk"
+    : pathname.includes("regional") || pathname.includes("organizations")
+      ? "regional"
+      : pathname.includes("surveillance") || pathname.includes("notifications")
+        ? "environment"
+        : pathname.includes("history")
+          ? "attention"
+          : pathname.includes("submit")
+            ? "status"
+            : basePath === "/admin" ? "regional" : "action";
   return (
-    <div className="min-h-screen bg-app">
-      <Sidebar
-        items={navItems}
-        basePath={basePath}
-        roleLabel={roleLabel}
-        roleIcon={roleIcon}
-        onLogout={onLogout}
-        systemStatus={hospitalStatus}
-      />
-      <div className="ml-[240px] min-h-screen">
-        <TopHeader title={title} avatarLabel={avatarLabel} />
-        <main className="mx-auto min-h-[calc(100vh-64px)] max-w-[1600px] px-5 py-6 sm:px-8 sm:py-8">
-          <Outlet />
-        </main>
+    <div className="min-h-screen bg-dashboard-backdrop text-slate-900 py-10 px-4 sm:py-12 sm:px-6">
+      <div className="mx-auto w-full max-w-[1720px] overflow-hidden rounded-[32px] border border-slate-200/70 bg-white/95 shadow-soft ring-1 ring-white/80 backdrop-blur-sm">
+        <div className="grid min-h-[calc(100vh-120px)] gap-6 lg:grid-cols-[280px_minmax(0,1fr)]">
+          <Sidebar
+            items={navItems}
+            basePath={basePath}
+            roleLabel={roleLabel}
+            roleIcon={roleIcon}
+            onLogout={onLogout}
+            systemStatus={hospitalStatus}
+          />
+          <div className="flex min-h-full flex-col">
+            <TopHeader title={title} avatarLabel={avatarLabel} />
+            <main className={"dashboard-grid dashboard-grid-" + dashboardTone + " flex-1 px-4 py-5 sm:px-6 sm:py-6 lg:px-8"}>
+              <Outlet />
+            </main>
+          </div>
+        </div>
       </div>
     </div>
   );

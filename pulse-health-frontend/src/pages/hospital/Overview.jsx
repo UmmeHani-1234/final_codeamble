@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "../../context/AuthContext.jsx";
 import { notificationUsers } from "../../data/mockData.js";
+import { SECTION_CLASSES, valueTone } from "../../utils/sectionStyles.js";
 
 export default function HospitalOverview() {
   const { currentHospital, currentAlerts, hospitals, alertsByHospital } = useAuth();
@@ -28,28 +29,28 @@ export default function HospitalOverview() {
       <div className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <p className="text-xs uppercase tracking-[0.32em] text-slate-500">{currentHospital?.name}</p>
-            <h1 className="text-3xl font-semibold text-slate-900 mt-2">{currentHospital?.region} hospital dashboard</h1>
-            <p className="mt-3 text-sm text-slate-500 max-w-2xl">
+            <p className={"text-[11px] uppercase tracking-[0.24em] " + SECTION_CLASSES.overview.eyebrow}>{currentHospital?.name}</p>
+            <h1 className={"text-[20px] font-semibold mt-2 " + SECTION_CLASSES.overview.title}>{currentHospital?.region} hospital dashboard</h1>
+            <p className="mt-3 text-[13.5px] text-slate-500 max-w-2xl leading-6">
               Fast, explainable early-warning alerts for your hospital, regional comparison, and submission workflow.
             </p>
           </div>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-            <div className="rounded-3xl border border-slate-200 bg-slate-50 p-4 text-center">
-              <div className="text-xs uppercase tracking-[0.24em] text-slate-500">Active alerts</div>
-              <div className="text-3xl font-bold text-slate-900 mt-3">{currentAlerts.length}</div>
+            <div className="rounded-3xl border surface-risk p-4 text-center">
+              <div className="text-[12.5px] uppercase tracking-[0.24em] text-slate-500">Active alerts</div>
+              <div className="text-[26px] font-semibold text-danger mt-3">{currentAlerts.length}</div>
             </div>
-            <div className="rounded-3xl border border-slate-200 bg-slate-50 p-4 text-center">
-              <div className="text-xs uppercase tracking-[0.24em] text-slate-500">High risk</div>
-              <div className="text-3xl font-bold text-slate-900 mt-3">{currentAlerts.filter((a) => a.risk === "High").length}</div>
+            <div className="rounded-3xl border surface-risk p-4 text-center">
+              <div className="text-[12.5px] uppercase tracking-[0.24em] text-slate-500">High risk</div>
+              <div className="text-[26px] font-semibold text-danger mt-3">{currentAlerts.filter((a) => a.risk === "High").length}</div>
             </div>
-            <div className="rounded-3xl border border-slate-200 bg-slate-50 p-4 text-center">
-              <div className="text-xs uppercase tracking-[0.24em] text-slate-500">Submitted today</div>
-              <div className="text-3xl font-bold text-slate-900 mt-3">{currentHospital?.lastActivity?.includes("min") ? "Yes" : "No"}</div>
+            <div className="rounded-3xl border surface-status p-4 text-center">
+              <div className="text-[12.5px] uppercase tracking-[0.24em] text-slate-500">Submitted today</div>
+              <div className="text-[26px] font-semibold text-success mt-3">{currentHospital?.lastActivity?.includes("min") ? "Yes" : "No"}</div>
             </div>
-            <div className="rounded-3xl border border-slate-200 bg-slate-50 p-4 text-center">
-              <div className="text-xs uppercase tracking-[0.24em] text-slate-500">Registered users</div>
-              <div className="text-3xl font-bold text-slate-900 mt-3">{hospitalUsers.length}</div>
+            <div className="rounded-3xl border surface-regional p-4 text-center">
+              <div className="text-[12.5px] uppercase tracking-[0.24em] text-slate-500">Registered users</div>
+              <div className="text-[26px] font-semibold text-indigo mt-3">{hospitalUsers.length}</div>
             </div>
           </div>
         </div>
@@ -58,8 +59,8 @@ export default function HospitalOverview() {
       <div className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div>
-            <p className="text-xs uppercase tracking-[0.32em] text-slate-500">Hospital messaging</p>
-            <h2 className="text-xl font-semibold text-slate-900 mt-2">Send SMS to your Patients</h2>
+            <p className="text-xs uppercase tracking-[0.32em] text-cyan/70">Hospital messaging</p>
+            <h2 className="text-xl font-semibold text-cyan mt-2">Send SMS to your Patients</h2>
           </div>
           <p className="max-w-xl text-sm text-slate-500">
             Notify a hospital staff member directly from the dashboard with an SMS alert.
@@ -113,7 +114,7 @@ export default function HospitalOverview() {
                 {smsSending ? "Sending..." : "Send SMS"}
               </button>
 
-              {smsStatus && <p className="text-sm text-slate-600">{smsStatus}</p>}
+              {smsStatus && <p className="text-sm text-success">{smsStatus}</p>}
             </div>
           </div>
         ) : (

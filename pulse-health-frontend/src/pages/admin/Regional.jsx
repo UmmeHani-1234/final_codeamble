@@ -13,7 +13,7 @@ export default function Regional() {
           <div className="icon-chip"><MapPin size={18} /></div>
           <div>
             <span className="eyebrow">Regional risk summary</span>
-            <h1 className="font-display text-[22px] mt-2">Current area alerts and disease risk levels</h1>
+            <h1 className="font-display text-[22px] mt-2 text-indigo">Current area alerts and disease risk levels</h1>
             <p className="text-muted text-[13.5px] mt-2">View the latest disease risk for each monitored region, including the top alert for the area.</p>
           </div>
         </div>
@@ -42,7 +42,7 @@ export default function Regional() {
                   <div className="font-semibold">{region.region}</div>
                   <div className="text-muted text-[12px]">Overall risk score</div>
                 </div>
-                <div className="font-display text-[22px] font-semibold">{region.risk}</div>
+                <div className={"font-display text-[22px] font-semibold " + (region.risk >= 75 ? "text-danger" : region.risk >= 60 ? "text-warning" : "text-indigo")}>{region.risk}</div>
               </button>
             ))}
           </div>

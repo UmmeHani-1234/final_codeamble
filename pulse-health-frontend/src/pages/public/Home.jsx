@@ -42,7 +42,7 @@ export default function Home() {
             <div className="grid lg:grid-cols-[1.05fr_0.95fr] gap-10 items-center">
               <div className="py-8">
                 <span className="eyebrow text-brand">Seasonality + disease activity + hospital signals</span>
-                <h1 className="font-display text-[38px] md:text-[54px] font-semibold leading-tight tracking-tight mt-5 max-w-[670px]">
+                <h1 className="font-display text-[38px] md:text-[54px] font-semibold leading-tight tracking-tight mt-5 max-w-[670px] text-indigo">
                   Detect the signal before it becomes the story.
                 </h1>
                 <p className="text-secondary text-[17px] leading-relaxed max-w-[600px] mt-6">
@@ -64,7 +64,7 @@ export default function Home() {
                   ].map((item) => (
                     <div key={item.label} className="rounded-3xl border border-line bg-white/80 p-5 shadow-soft backdrop-blur-sm">
                       <div className="text-[14px] text-muted">{item.label}</div>
-                      <div className="font-display text-[24px] font-semibold mt-3">{item.value}</div>
+                      <div className="font-display text-[24px] font-semibold mt-3 text-brand">{item.value}</div>
                     </div>
                   ))}
                 </div>
@@ -134,7 +134,7 @@ export default function Home() {
           <div className="grid lg:grid-cols-2 gap-10 items-start">
             <div>
               <span className="eyebrow text-brand">Platform</span>
-              <h2 className="font-display text-[34px] font-semibold mt-4 max-w-[540px]">
+              <h2 className="font-display text-[34px] font-semibold mt-4 max-w-[540px] text-indigo">
                 A premium platform for early warning and clinical coordination.
               </h2>
               <p className="text-secondary text-[16px] leading-relaxed mt-5 max-w-[520px]">
@@ -158,7 +158,7 @@ export default function Home() {
 
         <section id="how" className="max-w-[1180px] mx-auto px-6 pb-24">
           <span className="eyebrow text-brand">How It Works</span>
-          <h2 className="font-display text-[34px] font-semibold mt-4 mb-10">Slow, subtle intelligence for high-stakes health decisions.</h2>
+          <h2 className="font-display text-[34px] font-semibold mt-4 mb-10 text-cyan">Slow, subtle intelligence for high-stakes health decisions.</h2>
           <div className="grid lg:grid-cols-3 gap-6">
             {[
               { title: "Collect", body: "Hospital data, environmental trends, and surveillance signals are ingested in one secure workflow." },
@@ -178,7 +178,7 @@ export default function Home() {
             <div className="rounded-[40px] border border-white/10 bg-white/10 p-10 shadow-[0_40px_120px_rgba(20,36,80,0.12)] backdrop-blur-xl">
               <div className="grid lg:grid-cols-[1.2fr_0.8fr] gap-8 items-center">
                 <div>
-                  <h2 className="font-display text-[44px] md:text-[52px] font-semibold leading-tight">
+                  <h2 className="font-display text-[44px] md:text-[52px] font-semibold leading-tight text-indigo">
                     Detect the signal before it becomes the story.
                   </h2>
                   <p className="text-muted text-[17px] leading-relaxed mt-5 max-w-[620px]">

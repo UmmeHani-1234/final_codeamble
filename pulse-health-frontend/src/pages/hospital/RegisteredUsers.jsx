@@ -3,6 +3,7 @@ import { Mail, ShieldCheck, Users } from "lucide-react";
 import { useAuth } from "../../context/AuthContext.jsx";
 import { notificationUsers } from "../../data/mockData.js";
 import EmptyState from "../../components/ui/EmptyState.jsx";
+import { SECTION_CLASSES } from "../../utils/sectionStyles.js";
 
 export default function HospitalRegisteredUsers() {
   const { currentHospital } = useAuth();
@@ -17,15 +18,15 @@ export default function HospitalRegisteredUsers() {
       <div className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <p className="text-xs uppercase tracking-[0.32em] text-slate-500">Registered users</p>
-            <h1 className="text-3xl font-semibold text-slate-900 mt-2">{currentHospital?.name} team</h1>
+            <p className={"text-xs uppercase tracking-[0.32em] " + SECTION_CLASSES.registeredUsers.eyebrow}>Registered users</p>
+            <h1 className={"text-3xl font-semibold mt-2 " + SECTION_CLASSES.registeredUsers.title}>{currentHospital?.name} team</h1>
             <p className="mt-3 text-sm text-slate-500 max-w-2xl">
               Manage who receives alerts and surveillance notifications for your hospital.
             </p>
           </div>
-          <div className="rounded-3xl bg-slate-50 px-5 py-4 text-slate-700 shadow-sm">
-            <div className="text-xs uppercase tracking-[0.32em] text-slate-500">Total users</div>
-            <div className="mt-2 text-xl font-semibold text-slate-900">{hospitalUsers.length}</div>
+          <div className="rounded-3xl bg-white px-5 py-4 text-slate-700 shadow-sm border border-slate-200">
+            <div className="text-[11px] uppercase tracking-[0.24em] text-slate-500">Total users</div>
+            <div className="mt-2 text-[18px] font-semibold text-indigo">{hospitalUsers.length}</div>
           </div>
         </div>
       </div>
@@ -33,6 +34,7 @@ export default function HospitalRegisteredUsers() {
       {hospitalUsers.length === 0 ? (
         <EmptyState
           icon={Users}
+          tone="info"
           title="No users assigned"
           sub="Add clinicians, surveillance leads, and network staff to start receiving alerts and notifications."
         />
@@ -43,7 +45,7 @@ export default function HospitalRegisteredUsers() {
               <p className="text-xs uppercase tracking-[0.32em] text-slate-500">Active recipients</p>
               <h2 className="text-xl font-semibold text-slate-900 mt-2">Notification roles</h2>
             </div>
-            <Mail className="text-blue-600" />
+            <Mail className="text-brand" />
           </div>
           <div className="overflow-x-auto">
             <table className="w-full min-w-[540px] border-collapse text-[13px]">
@@ -56,7 +58,7 @@ export default function HospitalRegisteredUsers() {
               </thead>
               <tbody>
                 {hospitalUsers.map((user) => (
-                  <tr key={user.id} className="border-t border-slate-200 hover:bg-slate-50 transition-colors">
+                  <tr key={user.id} className="border-t border-slate-200 hover:bg-cyan-tint/55 transition-colors">
                     <td className="py-4 text-slate-900">{user.name}</td>
                     <td className="py-4 text-slate-700">{user.role}</td>
                     <td className="py-4 text-slate-700">{user.email}</td>

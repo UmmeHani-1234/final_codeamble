@@ -37,7 +37,7 @@ export default function Notifications() {
           </thead>
           <tbody>
             {notificationUsers.map((user) => (
-              <tr key={user.id} className="table-row-hover">
+              <tr key={user.id} className="table-row-hover table-row-hover-info">
                 <td className="py-3 border-t border-line">{user.name}</td>
                 <td className="py-3 border-t border-line">{user.role}</td>
                 <td className="py-3 border-t border-line text-muted">
@@ -45,7 +45,7 @@ export default function Notifications() {
                 </td>
                 <td className="py-3 border-t border-line text-muted">{user.email}</td>
                 <td className="py-3 border-t border-line">
-                  <button className="btn-secondary">Send notification</button>
+                  <button className="btn-info">Send notification</button>
                 </td>
               </tr>
             ))}

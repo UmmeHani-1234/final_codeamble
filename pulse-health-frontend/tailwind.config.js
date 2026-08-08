@@ -11,25 +11,45 @@ export default {
         secondary: "#64748B",
         muted: "#94A3B8",
         brand: {
-          DEFAULT: "#2563EB",
-          dark: "#1D4ED8",
+          DEFAULT: "#2554E8",
+          dark: "#1E40FF",
           tint: "#EFF6FF",
+        },
+        indigo: {
+          DEFAULT: "#6C5CE7",
+          tint: "#EEF2FF",
+        },
+        cyan: {
+          DEFAULT: "#0EA5B7",
+          tint: "#D1FAFA",
+        },
+        danger: {
+          DEFAULT: "#C0324B",
+          tint: "#FDE7EB",
+        },
+        rose: {
+          DEFAULT: "#C81E4B",
+          tint: "#FDE8EE",
+        },
+        warning: {
+          DEFAULT: "#AD7A0A",
+          tint: "#FEF3C7",
+        },
+        amber: {
+          DEFAULT: "#B45309",
+          tint: "#FFEDD5",
+        },
+        success: {
+          DEFAULT: "#1E8E5A",
+          tint: "#DCFCE7",
+        },
+        emerald: {
+          DEFAULT: "#047857",
+          tint: "#ECFDF5",
         },
         info: {
           DEFAULT: "#2563EB",
-          tint: "#EFF6FF",
-        },
-        danger: {
-          DEFAULT: "#EF4444",
-          tint: "#FEE2E2",
-        },
-        warning: {
-          DEFAULT: "#F59E0B",
-          tint: "#FEF3C7",
-        },
-        success: {
-          DEFAULT: "#22C55E",
-          tint: "#DCFCE7",
+          tint: "#DBEAFE",
         },
       },
       fontFamily: {

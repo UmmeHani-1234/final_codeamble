@@ -32,7 +32,7 @@ export default function SubmitData() {
   return (
     <div className="grid lg:grid-cols-[1.3fr_1fr] gap-5">
       <form onSubmit={handleSubmit} className="card">
-        <span className="eyebrow">Submit surveillance data — {currentHospital?.name}</span>
+        <span className="eyebrow text-slate-600">Submit surveillance data — {currentHospital?.name}</span>
         <div className="grid sm:grid-cols-2 gap-3.5 mt-4">
           {FIELDS.map((f) => (
             <label className="field-label" key={f.key}>
@@ -57,8 +57,8 @@ export default function SubmitData() {
         {submitted && <p className="text-success text-[12.5px] mt-3">Submitted — thank you.</p>}
       </form>
 
-      <div className="card">
-        <span className="eyebrow">Submission health</span>
+      <div className="card surface-status">
+        <span className="eyebrow text-success">Submission health</span>
         <div className="flex flex-col mt-3.5">
           <Row label="Today's submission" value={<span className="badge-success">Complete</span>} first />
           <Row label="Last submitted" value={currentHospital?.lastActivity} />
@@ -72,9 +72,9 @@ export default function SubmitData() {
 
 function Row({ label, value, first }) {
   return (
-    <div className={"flex justify-between py-2.5 text-[13px] " + (first ? "" : "border-t border-line")}>
-      <span>{label}</span>
-      <span>{value}</span>
+    <div className={"flex justify-between py-3 text-[13.5px] " + (first ? "" : "border-t border-line")}>
+      <span className="text-[13.5px] text-slate-900">{label}</span>
+      <span className="text-[13px] text-slate-700">{value}</span>
     </div>
   );
 }

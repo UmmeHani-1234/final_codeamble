@@ -8,7 +8,7 @@ export default function AdminAlerts() {
   const allAlerts = flattenAllAlerts(hospitals, alertsByHospital);
 
   if (allAlerts.length === 0) {
-    return <EmptyState title="No alerts across the network" sub="Every connected hospital is currently clear of active signals." />;
+    return <EmptyState title="No alerts across the network" sub="Every connected hospital is currently clear of active signals." tone="success" />;
   }
 
   return (

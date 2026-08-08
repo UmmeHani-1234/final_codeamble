@@ -12,11 +12,12 @@ const FACTOR_STYLE = {
   "Recent disease activity": { icon: TrendingUp, tint: "bg-danger-tint text-danger" },
   "Hospital admissions": { icon: Building2, tint: "bg-brand-tint text-brand" },
   "Regional activity": { icon: MapPin, tint: "bg-indigo-tint text-indigo" },
-  "Rainfall": { icon: CloudRain, tint: "bg-brand-tint text-brand" },
-  "Humidity": { icon: Droplets, tint: "bg-warning-tint text-warning" },
+  "Rainfall": { icon: CloudRain, tint: "bg-cyan-tint text-cyan" },
+  "Humidity": { icon: Droplets, tint: "bg-cyan-tint text-cyan" },
 };
 
 const RISK_RING = { High: "#C0324B", Medium: "#AD7A0A", Low: "#1E8E5A" };
+const RISK_SURFACE = { High: "surface-risk", Medium: "surface-attention", Low: "surface-status" };
 
 function Gauge({ value, risk }) {
   const size = 108;
@@ -76,11 +77,7 @@ export default function AlertDetail() {
         {/* MAIN COLUMN */}
         <div className="flex flex-col gap-5">
           {/* Header card with accent bar + gauge */}
-          <div className="card relative overflow-hidden !p-0">
-            <div
-              className="h-1.5 w-full"
-              style={{ background: `linear-gradient(90deg, ${RISK_RING[alert.risk] || "#2554E8"}, #6C5CE7)` }}
-            />
+          <div className={"card relative overflow-hidden !p-0 " + (RISK_SURFACE[alert.risk] || "surface-action")}>
             <div className="p-6 flex items-center justify-between gap-6 flex-wrap">
               <div>
                 <RiskBadge level={alert.risk} />
@@ -150,7 +147,7 @@ export default function AlertDetail() {
           {/* Actions */}
           <div className="flex gap-2.5 justify-end flex-wrap">
             <button className="btn-ghost">Continue monitoring</button>
-            <button className="btn-secondary">Dismiss</button>
+            <button className="btn-danger">Dismiss</button>
             <button className="btn-primary">Confirm &amp; notify</button>
           </div>
         </div>
@@ -167,7 +164,7 @@ export default function AlertDetail() {
             </div>
           </div>
 
-          <div className="card">
+          <div className="card surface-action">
             <span className="eyebrow">Notify &amp; coordinate</span>
             <p className="text-[12.5px] text-muted mt-2 mb-4 leading-relaxed">
               Escalate this signal to the regional health office or loop in your care team.
@@ -175,7 +172,7 @@ export default function AlertDetail() {
             <button className="btn-primary w-full justify-center mb-2">
               <Phone size={14} /> Notify regional office
             </button>
-            <button className="btn-ghost w-full justify-center">
+            <button className="btn-info w-full justify-center">
               <MessageSquare size={14} /> Message care team
             </button>
           </div>
