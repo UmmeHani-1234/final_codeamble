@@ -6,30 +6,30 @@ export default {
       colors: {
         app: "#F7F9FC",
         surface: "#FFFFFF",
-        line: "rgba(15,23,42,0.07)",
+        line: "#E2E8F0",
         ink: "#0F172A",
-        secondary: "#475066",
-        muted: "#94A0B2",
+        secondary: "#64748B",
+        muted: "#94A3B8",
         brand: {
-          DEFAULT: "#2554E8",
-          dark: "#1E46CC",
-          tint: "#EAF0FE",
+          DEFAULT: "#2563EB",
+          dark: "#1D4ED8",
+          tint: "#EFF6FF",
         },
-        indigo: {
-          DEFAULT: "#6C5CE7",
-          tint: "#EFEBFC",
+        info: {
+          DEFAULT: "#2563EB",
+          tint: "#EFF6FF",
         },
         danger: {
-          DEFAULT: "#C0324B",
-          tint: "#FBE9ED",
+          DEFAULT: "#EF4444",
+          tint: "#FEE2E2",
         },
         warning: {
-          DEFAULT: "#AD7A0A",
-          tint: "#FBF1DE",
+          DEFAULT: "#F59E0B",
+          tint: "#FEF3C7",
         },
         success: {
-          DEFAULT: "#1E8E5A",
-          tint: "#E7F6EE",
+          DEFAULT: "#22C55E",
+          tint: "#DCFCE7",
         },
       },
       fontFamily: {

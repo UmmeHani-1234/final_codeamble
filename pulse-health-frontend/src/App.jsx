@@ -1,5 +1,5 @@
 import { Routes, Route } from "react-router-dom";
-import { Home as HomeIcon, AlertTriangle, ClipboardList, Clock, Bell, Settings, MapPin, Building2, ShieldCheck } from "lucide-react";
+import { Home as HomeIcon, AlertTriangle, ClipboardList, Clock, Bell, Settings, MapPin, Building2, ShieldCheck, Users, Upload, BarChart3 } from "lucide-react";
 import { useAuth } from "./context/AuthContext.jsx";
 
 import Home from "./pages/public/Home.jsx";
@@ -12,9 +12,13 @@ import DashboardLayout from "./components/layout/DashboardLayout.jsx";
 import HospitalOverview from "./pages/hospital/Overview.jsx";
 import HospitalAlerts from "./pages/hospital/Alerts.jsx";
 import HospitalAlertDetail from "./pages/hospital/AlertDetail.jsx";
+import HospitalRegional from "./pages/hospital/Regional.jsx";
+import HospitalSurveillance from "./pages/hospital/Surveillance.jsx";
 import HospitalSubmitData from "./pages/hospital/SubmitData.jsx";
 import HospitalHistory from "./pages/hospital/History.jsx";
+import HospitalRegisteredUsers from "./pages/hospital/RegisteredUsers.jsx";
 import HospitalNotifications from "./pages/hospital/Notifications.jsx";
+import HospitalRiskHistory from "./pages/hospital/RiskHistory.jsx";
 import HospitalSettings from "./pages/hospital/Settings.jsx";
 
 import AdminOverview from "./pages/admin/Overview.jsx";
@@ -27,10 +31,14 @@ import AdminSettings from "./pages/admin/Settings.jsx";
 
 const hospitalNav = [
   { key: "", label: "Overview", icon: HomeIcon },
-  { key: "alerts", label: "Alerts", icon: AlertTriangle },
-  { key: "submit", label: "Submit Data", icon: ClipboardList },
-  { key: "history", label: "History", icon: Clock },
+  { key: "alerts", label: "Early Warning Alerts", icon: AlertTriangle },
+  { key: "regional", label: "Regional Intelligence", icon: MapPin },
+  { key: "surveillance", label: "Hospital Surveillance", icon: ClipboardList },
+  { key: "submit", label: "Upload Data", icon: Upload },
+  { key: "history", label: "Submission History", icon: Clock },
+  { key: "users", label: "Registered Users", icon: Users },
   { key: "notifications", label: "Notifications", icon: Bell },
+  { key: "risk-history", label: "Risk History", icon: BarChart3 },
   { key: "settings", label: "Settings", icon: Settings },
 ];
 
@@ -46,6 +54,7 @@ const adminNav = [
 
 function HospitalDashboardLayout() {
   const { currentHospital, logout, hospitals } = useAuth();
+
   const sidebarUsers = currentHospital
     ? hospitals
         .filter((hospital) => hospital.id === currentHospital.id)
@@ -67,6 +76,7 @@ function HospitalDashboardLayout() {
       title="Hospital Dashboard"
       onLogout={logout}
       users={sidebarUsers}
+      hospitalStatus={currentHospital?.status}
     />
   );
 }
@@ -112,9 +122,13 @@ export default function App() {
         <Route index element={<HospitalOverview />} />
         <Route path="alerts" element={<HospitalAlerts />} />
         <Route path="alerts/:id" element={<HospitalAlertDetail />} />
+        <Route path="regional" element={<HospitalRegional />} />
+        <Route path="surveillance" element={<HospitalSurveillance />} />
         <Route path="submit" element={<HospitalSubmitData />} />
         <Route path="history" element={<HospitalHistory />} />
+        <Route path="users" element={<HospitalRegisteredUsers />} />
         <Route path="notifications" element={<HospitalNotifications />} />
+        <Route path="risk-history" element={<HospitalRiskHistory />} />
         <Route path="settings" element={<HospitalSettings />} />
       </Route>
 

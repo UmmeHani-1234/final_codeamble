@@ -1,81 +1,58 @@
 import { NavLink } from "react-router-dom";
-import { Activity, LogOut, X } from "lucide-react";
+import { Activity, LogOut } from "lucide-react";
 
-export default function Sidebar({ items, roleLabel, roleIcon: RoleIcon, basePath, onLogout, open, onClose, users = [] }) {
+export default function Sidebar({ items, roleLabel, roleIcon: RoleIcon, basePath, onLogout, systemStatus }) {
   return (
-    <>
-      {open && (
-        <div
-          className="fixed inset-0 bg-ink/30 z-30 lg:hidden"
-          onClick={onClose}
-        />
-      )}
-      <aside
-        className={
-          "w-[248px] flex-shrink-0 bg-surface border-r border-line flex flex-col p-3.5 fixed lg:sticky top-0 h-screen z-40 transition-transform duration-200 " +
-          (open ? "translate-x-0" : "-translate-x-full lg:translate-x-0")
-        }
-      >
-        <div className="flex items-center gap-2.5 px-2 pb-5 relative">
-          <span className="w-8 h-8 rounded-[9px] bg-brand text-white flex items-center justify-center flex-shrink-0">
-            <Activity size={16} />
-          </span>
-          <div>
-            <div className="font-display text-[15px] font-semibold leading-none">Pulse</div>
-            <div className="text-muted text-[10.5px] tracking-wide mt-1">HEALTH INTELLIGENCE</div>
-          </div>
-          <button className="lg:hidden absolute right-0 top-0 icon-btn" onClick={onClose}>
-            <X size={16} />
-          </button>
+    <aside className="fixed left-0 top-0 h-[100vh] w-[240px] flex-shrink-0 bg-white border-r border-slate-200 flex flex-col px-4 py-5 overflow-hidden z-40">
+      <div className="flex items-center gap-3 px-1 pb-5">
+        <span className="w-11 h-11 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center shadow-sm">
+          <Activity size={18} />
+        </span>
+        <div>
+          <div className="font-semibold text-sm text-slate-900">ShadowDoctor AI</div>
+          <div className="text-[11px] uppercase tracking-[0.3em] text-slate-500 mt-1">Health intelligence</div>
         </div>
+      </div>
 
-        <nav className="flex flex-col gap-0.5 flex-1">
+      <div className="flex-1 min-h-0 overflow-hidden">
+        <nav className="flex flex-col gap-1.5 min-h-0 overflow-y-auto pr-1">
           {items.map((it) => (
             <NavLink
               key={it.key}
               to={it.key === "" ? basePath : `${basePath}/${it.key}`}
               end={it.key === ""}
-              onClick={onClose}
               className={({ isActive }) =>
                 "sidebar-item " + (isActive ? "sidebar-item-active" : "")
               }
             >
-              <it.icon size={16} />
+              <it.icon size={18} />
               <span>{it.label}</span>
             </NavLink>
           ))}
         </nav>
+      </div>
 
-        {users.length > 0 && (
-          <div className="border-t border-line pt-3 mt-2">
-            <div className="px-2 pb-2 text-[11px] uppercase tracking-wide text-muted font-semibold">Users</div>
-            <div className="space-y-2 max-h-[220px] overflow-y-auto px-2 pb-3">
-              {users.map((user) => (
-                <div key={user.id} className="flex items-center justify-between gap-3 rounded-2xl bg-slate-50/80 px-3 py-2">
-                  <div className="min-w-0">
-                    <div className="font-semibold text-[13px] truncate">{user.name}</div>
-                    <div className="text-muted text-[11px] truncate">{user.role}</div>
-                  </div>
-                  <span className="badge badge-muted text-[10.5px] whitespace-nowrap">
-                    {user.hospitalId ? "Hospital" : "Network"}
-                  </span>
-                </div>
-              ))}
-            </div>
+      <div className="mt-4 border-t border-slate-200 pt-4">
+        <div className="flex items-center gap-3 px-1 mb-4">
+          <span className="w-10 h-10 rounded-2xl bg-slate-100 text-slate-700 flex items-center justify-center">
+            <RoleIcon size={16} />
+          </span>
+          <div className="min-w-0">
+            <div className="text-sm font-semibold text-slate-900 truncate">{roleLabel}</div>
+            <div className="text-[12px] text-slate-500 truncate">Hospital profile</div>
+          </div>
+        </div>
+        {systemStatus && (
+          <div className="mb-4 rounded-2xl border border-slate-200 bg-slate-50 px-3 py-3 text-[13px] text-slate-700">
+            <div className="text-xs uppercase tracking-[0.28em] text-slate-500">System status</div>
+            <div className="mt-2 font-semibold text-slate-900">{systemStatus}</div>
           </div>
         )}
-
-        <div className="border-t border-line pt-3 mt-2">
-          <div className="flex items-center gap-2 px-2 py-2 mb-1">
-            <span className="icon-chip"><RoleIcon size={14} /></span>
-            <span className="text-[12.5px] truncate">{roleLabel}</span>
-          </div>
-          <button className="sidebar-item" onClick={onLogout}>
-            <LogOut size={16} />
-            <span>Log out</span>
-          </button>
-        </div>
-      </aside>
-    </>
+        <button className="sidebar-item text-slate-700 hover:bg-slate-50" onClick={onLogout}>
+          <LogOut size={16} />
+          <span>Log out</span>
+        </button>
+      </div>
+    </aside>
   );
 }

@@ -11,23 +11,47 @@ body {
 
 @layer components {
   .btn {
-    @apply inline-flex items-center gap-1.5 rounded-xl px-4 py-2.5 text-[13.5px] font-semibold transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed;
+    @apply inline-flex items-center justify-center gap-2 rounded-2xl px-4 py-2.5 text-sm font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed;
   }
   .btn-primary {
-    @apply btn bg-brand text-white shadow-soft hover:bg-brand-dark hover:-translate-y-0.5;
+    @apply btn bg-brand text-white border border-transparent shadow-sm hover:bg-brand-dark hover:-translate-y-0.5;
   }
   .btn-secondary {
-    @apply btn bg-danger-tint text-danger hover:brightness-95;
+    @apply btn bg-white text-slate-700 border border-slate-200 hover:bg-slate-50;
   }
   .btn-ghost {
-    @apply btn bg-surface text-secondary border border-line hover:bg-slate-50;
+    @apply btn bg-transparent text-slate-700 hover:bg-slate-50;
   }
   .btn-lg {
     @apply px-5 py-3.5 rounded-2xl text-[14.5px];
   }
 
   .card {
-    @apply bg-surface border border-line rounded-2xl shadow-soft p-5;
+    @apply bg-white border border-slate-200 rounded-2xl shadow-sm p-5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md;
+  }
+
+  .bg-home-surface {
+    background: radial-gradient(circle at top left, rgba(124, 58, 237, 0.08), transparent 26%),
+                radial-gradient(circle at 18% 78%, rgba(192, 132, 252, 0.1), transparent 22%),
+                #fdfcff;
+  }
+
+  .bg-cta-gradient {
+    background: linear-gradient(135deg, rgba(241, 229, 255, 0.95), rgba(255, 250, 255, 1));
+  }
+
+  .bg-login-page {
+    background: radial-gradient(circle at top left, rgba(124, 58, 237, 0.09), transparent 18%),
+                radial-gradient(circle at bottom right, rgba(139, 92, 246, 0.08), transparent 16%),
+                #ffffff;
+  }
+
+  .floating-card {
+    transform: translateY(0);
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
+  }
+  .floating-card:hover {
+    transform: translateY(-6px);
   }
 
   .badge {
@@ -36,7 +60,8 @@ body {
   .badge-danger { @apply badge bg-danger-tint text-danger; }
   .badge-warning { @apply badge bg-warning-tint text-warning; }
   .badge-success { @apply badge bg-success-tint text-success; }
-  .badge-muted { @apply badge bg-slate-100 text-secondary; }
+  .badge-info { @apply badge bg-info-tint text-info; }
+  .badge-muted { @apply badge bg-slate-100 text-slate-500; }
 
   .icon-chip {
     @apply w-8 h-8 rounded-[10px] bg-brand-tint text-brand flex items-center justify-center flex-shrink-0;
@@ -51,14 +76,15 @@ body {
     @apply flex flex-col gap-1.5 text-[12.5px] font-medium text-secondary;
   }
   .field-input {
-    @apply w-full border border-line rounded-xl px-3 py-2.5 text-[13.5px] bg-slate-50/60 focus:outline-none focus:ring-2 focus:ring-brand text-ink;
+    @apply w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition-all duration-200 focus:border-brand focus:ring-4 focus:ring-brand-tint;
   }
 
   .sidebar-item {
-    @apply flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-[13.5px] text-secondary hover:bg-slate-50 w-full text-left transition-colors;
+    @apply flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-slate-700 hover:bg-slate-50 transition-all duration-200 w-full text-left;
   }
+
   .sidebar-item-active {
-    @apply bg-brand-tint text-brand font-semibold;
+    @apply bg-blue-50 text-blue-600 font-semibold shadow-sm;
   }
 
   .table-row-hover {
@@ -66,7 +92,7 @@ body {
   }
 
   .link {
-    @apply text-brand text-[12.5px] font-semibold hover:underline;
+    @apply text-blue-600 text-sm font-semibold hover:underline;
   }
 }
 

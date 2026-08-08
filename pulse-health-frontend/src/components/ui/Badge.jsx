@@ -1,23 +1,23 @@
 const RISK_MAP = {
-  High: "badge-danger",
-  Medium: "badge-warning",
-  Low: "badge-success",
-  Normal: "badge-muted",
+  High: "inline-flex items-center gap-1.5 rounded-full bg-danger-tint px-3 py-1 text-xs font-semibold text-danger",
+  Medium: "inline-flex items-center gap-1.5 rounded-full bg-warning-tint px-3 py-1 text-xs font-semibold text-warning",
+  Low: "inline-flex items-center gap-1.5 rounded-full bg-success-tint px-3 py-1 text-xs font-semibold text-success",
+  Normal: "inline-flex items-center gap-1.5 rounded-full bg-info-tint px-3 py-1 text-xs font-semibold text-info",
 };
 
 const STATUS_MAP = {
-  Reporting: "badge-success",
-  Delayed: "badge-warning",
-  "Needs review": "badge-danger",
-  Monitoring: "badge-warning",
-  Normal: "badge-muted",
-  Complete: "badge-success",
+  Reporting: "inline-flex items-center gap-1.5 rounded-full bg-success-tint px-3 py-1 text-xs font-semibold text-success",
+  Delayed: "inline-flex items-center gap-1.5 rounded-full bg-warning-tint px-3 py-1 text-xs font-semibold text-warning",
+  "Needs review": "inline-flex items-center gap-1.5 rounded-full bg-danger-tint px-3 py-1 text-xs font-semibold text-danger",
+  Monitoring: "inline-flex items-center gap-1.5 rounded-full bg-warning-tint px-3 py-1 text-xs font-semibold text-warning",
+  Normal: "inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600",
+  Complete: "inline-flex items-center gap-1.5 rounded-full bg-success-tint px-3 py-1 text-xs font-semibold text-success",
 };
 
 export function RiskBadge({ level }) {
-  return <span className={RISK_MAP[level] || "badge-muted"}>{level}</span>;
+  return <span className={RISK_MAP[level] || "inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600"}>{level}</span>;
 }
 
 export function StatusBadge({ status }) {
-  return <span className={STATUS_MAP[status] || "badge-muted"}>{status}</span>;
+  return <span className={STATUS_MAP[status] || "inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600"}>{status}</span>;
 }

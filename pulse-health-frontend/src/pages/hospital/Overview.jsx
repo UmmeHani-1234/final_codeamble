@@ -1,129 +1,128 @@
-import { useNavigate } from "react-router-dom";
-import { Activity, AlertTriangle, CheckCircle2, ChevronRight, ClipboardList } from "lucide-react";
-import { LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer } from "recharts";
+import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "../../context/AuthContext.jsx";
-import { trendData } from "../../data/mockData.js";
-import KpiCard from "../../components/ui/KpiCard.jsx";
-import { RiskBadge } from "../../components/ui/Badge.jsx";
+import { notificationUsers } from "../../data/mockData.js";
 
 export default function HospitalOverview() {
-  const { currentHospital, currentAlerts } = useAuth();
-  const navigate = useNavigate();
+  const { currentHospital, currentAlerts, hospitals, alertsByHospital } = useAuth();
 
-  const needsReview = currentAlerts.filter((a) => a.status === "Needs review").length;
+  const [smsRecipient, setSmsRecipient] = useState("");
+  const [smsText, setSmsText] = useState("");
+  const [smsStatus, setSmsStatus] = useState("");
+  const [smsSending, setSmsSending] = useState(false);
+
+  const hospitalUsers = useMemo(
+    () => notificationUsers.filter((user) => user.hospitalId === currentHospital?.id),
+    [currentHospital]
+  );
+
+  useEffect(() => {
+    if (!smsRecipient && hospitalUsers.length > 0) {
+      setSmsRecipient(hospitalUsers[0].id);
+    }
+  }, [hospitalUsers, smsRecipient]);
+
   const topAlert = [...currentAlerts].sort((a, b) => b.probability - a.probability)[0];
 
   return (
-    <div className="flex flex-col gap-5">
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <KpiCard label="Active alerts" value={currentAlerts.length} sub="for your hospital" icon={AlertTriangle} />
-        <KpiCard
-          label="Highest priority"
-          value={topAlert ? topAlert.disease : "None"}
-          sub={topAlert ? `${topAlert.probability}% · ${topAlert.risk} risk` : "No active signals"}
-          icon={Activity}
-        />
-        <KpiCard label="Needs review" value={needsReview} sub="awaiting your action" icon={ClipboardList} />
-        <KpiCard
-          label="Data completeness"
-          value={`${currentHospital?.completeness ?? 0}%`}
-          sub="this reporting period"
-          trend="up"
-          icon={CheckCircle2}
-        />
+    <div className="flex flex-col gap-6">
+      <div className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <p className="text-xs uppercase tracking-[0.32em] text-slate-500">{currentHospital?.name}</p>
+            <h1 className="text-3xl font-semibold text-slate-900 mt-2">{currentHospital?.region} hospital dashboard</h1>
+            <p className="mt-3 text-sm text-slate-500 max-w-2xl">
+              Fast, explainable early-warning alerts for your hospital, regional comparison, and submission workflow.
+            </p>
+          </div>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            <div className="rounded-3xl border border-slate-200 bg-slate-50 p-4 text-center">
+              <div className="text-xs uppercase tracking-[0.24em] text-slate-500">Active alerts</div>
+              <div className="text-3xl font-bold text-slate-900 mt-3">{currentAlerts.length}</div>
+            </div>
+            <div className="rounded-3xl border border-slate-200 bg-slate-50 p-4 text-center">
+              <div className="text-xs uppercase tracking-[0.24em] text-slate-500">High risk</div>
+              <div className="text-3xl font-bold text-slate-900 mt-3">{currentAlerts.filter((a) => a.risk === "High").length}</div>
+            </div>
+            <div className="rounded-3xl border border-slate-200 bg-slate-50 p-4 text-center">
+              <div className="text-xs uppercase tracking-[0.24em] text-slate-500">Submitted today</div>
+              <div className="text-3xl font-bold text-slate-900 mt-3">{currentHospital?.lastActivity?.includes("min") ? "Yes" : "No"}</div>
+            </div>
+            <div className="rounded-3xl border border-slate-200 bg-slate-50 p-4 text-center">
+              <div className="text-xs uppercase tracking-[0.24em] text-slate-500">Registered users</div>
+              <div className="text-3xl font-bold text-slate-900 mt-3">{hospitalUsers.length}</div>
+            </div>
+          </div>
+        </div>
       </div>
 
-      {topAlert ? (
-        <div className="card p-6">
-          <div className="flex items-center justify-between mb-1">
-            <span className="eyebrow">Your top signal right now</span>
-            <span className="text-muted text-[11.5px]">Updated 5 min ago</span>
+      <div className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <p className="text-xs uppercase tracking-[0.32em] text-slate-500">Hospital messaging</p>
+            <h2 className="text-xl font-semibold text-slate-900 mt-2">Send SMS to your Patients</h2>
           </div>
-          <div className="grid md:grid-cols-2 gap-8 items-center mt-1.5">
-            <div>
-              <RiskBadge level={topAlert.risk} />
-              <h2 className="font-display text-[28px] mt-2.5 mb-0.5">{topAlert.disease}</h2>
-              <p className="text-muted text-[13.5px] m-0">{currentHospital?.name} · {topAlert.window}</p>
-              <div className="flex items-end gap-2 mt-4">
-                <span className="font-display text-[40px] font-semibold leading-none">{topAlert.probability}%</span>
-                <span className="text-muted text-[12.5px] mb-1.5">predicted probability</span>
-              </div>
-              <button
-                className="btn-primary mt-4"
-                onClick={() => navigate(`/hospital/alerts/${topAlert.id}`)}
+          <p className="max-w-xl text-sm text-slate-500">
+            Notify a hospital staff member directly from the dashboard with an SMS alert.
+          </p>
+        </div>
+
+        {hospitalUsers.length > 0 ? (
+          <div className="mt-6 grid gap-4">
+            <label className="field-label">
+              <span>Recipient</span>
+              <select
+                className="field-input"
+                value={smsRecipient}
+                onChange={(e) => setSmsRecipient(e.target.value)}
               >
-                Review alert <ChevronRight size={15} />
-              </button>
-            </div>
-            <div className="h-[150px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={trendData}>
-                  <CartesianGrid stroke="#EEF1F6" vertical={false} />
-                  <XAxis dataKey="day" tick={{ fontSize: 11, fill: "#94A0B2" }} axisLine={false} tickLine={false} />
-                  <YAxis hide />
-                  <Tooltip contentStyle={{ borderRadius: 12, border: "1px solid #EEF1F6", fontSize: 12 }} />
-                  <Line type="monotone" dataKey="cases" stroke="#2554E8" strokeWidth={2.5} dot={false} />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-        </div>
-      ) : (
-        <div className="card text-center py-14">
-          <h3 className="font-display text-[18px] mb-1">No active signals</h3>
-          <p className="text-muted text-[13.5px]">Your hospital has no open alerts right now. Keep submitting daily data to stay covered.</p>
-        </div>
-      )}
-
-      <div className="grid lg:grid-cols-[1.3fr_1fr] gap-5">
-        <div className="card">
-          <div className="flex items-center justify-between mb-3.5">
-            <span className="eyebrow">Recent activity</span>
-            <button className="link" onClick={() => navigate("/hospital/alerts")}>View all</button>
-          </div>
-          {currentAlerts.length === 0 ? (
-            <p className="text-muted text-[13px] py-4">No alerts recorded for your hospital yet.</p>
-          ) : (
-            <table className="w-full border-collapse text-[13px]">
-              <thead>
-                <tr className="text-left">
-                  <th className="pb-2.5 text-[11px] uppercase tracking-wide text-muted font-semibold">Disease</th>
-                  <th className="pb-2.5 text-[11px] uppercase tracking-wide text-muted font-semibold">Risk</th>
-                  <th className="pb-2.5"></th>
-                </tr>
-              </thead>
-              <tbody>
-                {currentAlerts.slice(0, 5).map((a) => (
-                  <tr key={a.id} className="table-row-hover" onClick={() => navigate(`/hospital/alerts/${a.id}`)}>
-                    <td className="py-3 border-t border-line">{a.disease}</td>
-                    <td className="py-3 border-t border-line"><RiskBadge level={a.risk} /></td>
-                    <td className="py-3 border-t border-line text-right text-muted"><ChevronRight size={15} /></td>
-                  </tr>
+                {hospitalUsers.map((user) => (
+                  <option key={user.id} value={user.id}>
+                    {user.name} — {user.role}
+                  </option>
                 ))}
-              </tbody>
-            </table>
-          )}
-        </div>
+              </select>
+            </label>
 
-        <div className="card">
-          <span className="eyebrow">Submission health</span>
-          <div className="flex flex-col mt-3.5">
-            <Row label="Today's submission" value={<span className="badge-success">Complete</span>} first />
-            <Row label="Last submitted" value={currentHospital?.lastActivity || "—"} />
-            <Row label="Data completeness" value={<span className="font-display font-semibold">{currentHospital?.completeness ?? 0}%</span>} />
-            <Row label="Next submission due" value="Tomorrow, 9:00 AM" />
+            <label className="field-label">
+              <span>Message</span>
+              <textarea
+                className="field-input min-h-[120px] resize-none"
+                placeholder="Type your SMS message here..."
+                value={smsText}
+                onChange={(e) => setSmsText(e.target.value)}
+              />
+            </label>
+
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <button
+                type="button"
+                className="btn-primary w-full sm:w-auto px-6"
+                onClick={() => {
+                  if (!smsRecipient || !smsText.trim()) return;
+                  setSmsSending(true);
+                  setSmsStatus("");
+                  setTimeout(() => {
+                    const sentTo = hospitalUsers.find((user) => user.id === smsRecipient);
+                    setSmsSending(false);
+                    setSmsStatus(`SMS queued to ${sentTo?.name || "selected staff"}.`);
+                    setSmsText("");
+                  }, 600);
+                }}
+                disabled={smsSending || !smsRecipient || !smsText.trim()}
+              >
+                {smsSending ? "Sending..." : "Send SMS"}
+              </button>
+
+              {smsStatus && <p className="text-sm text-slate-600">{smsStatus}</p>}
+            </div>
           </div>
-        </div>
+        ) : (
+          <div className="mt-6 rounded-3xl border border-slate-200 bg-slate-50 p-5 text-sm text-slate-600">
+            No staff contact is configured for this hospital yet.
+          </div>
+        )}
       </div>
-    </div>
-  );
-}
 
-function Row({ label, value, first }) {
-  return (
-    <div className={"flex justify-between py-2.5 text-[13px] " + (first ? "" : "border-t border-line")}>
-      <span>{label}</span>
-      <span>{value}</span>
     </div>
   );
 }

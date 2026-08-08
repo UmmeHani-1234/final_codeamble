@@ -1,27 +1,23 @@
-import { useState } from "react";
 import { Outlet } from "react-router-dom";
 import Sidebar from "./Sidebar.jsx";
 import TopHeader from "./TopHeader.jsx";
 
-export default function DashboardLayout({ navItems, basePath, roleLabel, roleIcon, avatarLabel, title, onLogout }) {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-
+export default function DashboardLayout({ navItems, basePath, roleLabel, roleIcon, avatarLabel, title, onLogout, hospitalStatus }) {
   return (
-    <div className="flex min-h-screen">
+    <div className="min-h-screen bg-app">
       <Sidebar
         items={navItems}
         basePath={basePath}
         roleLabel={roleLabel}
         roleIcon={roleIcon}
         onLogout={onLogout}
-        open={sidebarOpen}
-        onClose={() => setSidebarOpen(false)}
+        systemStatus={hospitalStatus}
       />
-      <div className="flex-1 min-w-0">
-        <TopHeader title={title} avatarLabel={avatarLabel} onMenu={() => setSidebarOpen(true)} />
-        <div className="p-5 sm:p-7 max-w-[1180px]">
+      <div className="ml-[240px] min-h-screen">
+        <TopHeader title={title} avatarLabel={avatarLabel} />
+        <main className="mx-auto min-h-[calc(100vh-64px)] max-w-[1600px] px-5 py-6 sm:px-8 sm:py-8">
           <Outlet />
-        </div>
+        </main>
       </div>
     </div>
   );
