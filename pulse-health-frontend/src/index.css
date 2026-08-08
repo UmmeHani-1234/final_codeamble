@@ -4,6 +4,12 @@
 @tailwind components;
 @tailwind utilities;
 
+@import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,450;9..144,550;9..144,650&family=Inter:wght@400;500;600;700;800&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 body {
   @apply bg-app text-ink antialiased;
   font-family: "Inter", sans-serif;
@@ -12,8 +18,10 @@ body {
 .bg-dashboard-backdrop {
   background-color: #f5f8ff;
   background-image: radial-gradient(circle at top left, rgba(124, 58, 237, 0.18), transparent 18%),
-                    radial-gradient(circle at 82% 18%, rgba(14, 165, 233, 0.12), transparent 16%),
-                    radial-gradient(circle at 22% 88%, rgba(99, 102, 241, 0.08), transparent 14%);
+                    radial-gradient(circle at 82% 18%, rgba(14, 165, 233, 0.25), transparent 16%),
+                    radial-gradient(circle at 22% 88%, rgba(99, 102, 241, 0.20), transparent 14%),
+                    radial-gradient(circle at 60% 40%, rgba(255, 99, 71, 0.12), transparent 20%);
+
 }
 
 .dashboard-grid {
@@ -70,6 +78,10 @@ body {
   .surface-attention { background: #FEF3C7; border-color: rgba(173, 122, 10, 0.18); }
   .surface-status { background: #DCFCE7; border-color: rgba(30, 142, 90, 0.18); }
   .surface-regional { background: #EEF2FF; border-color: rgba(108, 92, 231, 0.18); }
+.surface-magenta { background: #FDE7FF; border-color: rgba(214, 67, 255, 0.18); }
+.surface-teal { background: #CCFBF1; border-color: rgba(13, 148, 136, 0.18); }
+.surface-lime { background: #ECFDF5; border-color: rgba(34, 197, 94, 0.18); }
+.surface-pink { background: #FFE4E6; border-color: rgba(236, 72, 153, 0.18); }
   .surface-environment { background: #D1FAFA; border-color: rgba(14, 165, 183, 0.18); }
   .surface-action { background: #EFF6FF; border-color: rgba(37, 84, 232, 0.18); }
 

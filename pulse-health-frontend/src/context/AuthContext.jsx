@@ -1,78 +1,179 @@
-import React, { createContext, useContext, useState, useCallback } from "react";
-import { seedHospitals, seedAlertsByHospital } from "../data/mockData.js";
+import React, { createContext, useContext, useState, useCallback, useEffect } from "react";
+import { hospitalLogin, hospitalRegister, adminLogin, getAdminHospitals, getHospitalMe } from "../services/api.js";
 
 // ---------------------------------------------------------------------------
-// Mock auth + data-scoping layer.
+// Real auth layer — JWT stored in localStorage, decoded on mount so the
+// session survives page refreshes.
 //
-// - `hospitals` holds every hospital that has registered on the platform.
-// - `alertsByHospital` holds each hospital's own alerts, keyed by hospitalId.
-// - A logged-in hospital user only ever gets *their own* hospital record and
-//   *their own* alerts back from this context (see currentHospital / currentAlerts).
-// - A logged-in admin user gets the full `hospitals` list and every hospital's
-//   alerts, for network-wide views.
+// Shape of stored data:
+//   localStorage key "pulse_token"  → raw JWT string
+//   localStorage key "pulse_user"   → JSON { role, hospitalId?, name?, email? }
 //
-// Swap the functions below for real API calls when a backend exists — the
-// shape (user, currentHospital, currentAlerts, hospitals, alertsByHospital)
-// is designed to map 1:1 onto typical REST/GraphQL responses.
+// `currentHospital` is derived from the stored user info and exposed as an
+// object shaped like { id, name, email } so the rest of the UI doesn't break.
 // ---------------------------------------------------------------------------
 
 const AuthContext = createContext(null);
 
+function readStoredUser() {
+  try {
+    const raw = localStorage.getItem("pulse_user");
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
+
 export function AuthProvider({ children }) {
-  const [hospitals, setHospitals] = useState(seedHospitals);
-  const [alertsByHospital, setAlertsByHospital] = useState(seedAlertsByHospital);
-  const [user, setUser] = useState(null); // { role: 'hospital' | 'admin', hospitalId? }
+  const [user, setUser] = useState(readStoredUser);
+  const [loading, setLoading] = useState(false);
+  // Full hospital profile loaded from /api/hospital/me
+  const [hospitalProfile, setHospitalProfile] = useState(null);
 
-  const loginAsHospital = useCallback((hospitalId) => {
-    setUser({ role: "hospital", hospitalId });
+  // Keep a list of hospitals for the admin dashboard sidebar.
+  // For hospital users this stays as a single-item array.
+  const [hospitals, setHospitals] = useState(() => {
+    const stored = readStoredUser();
+    if (stored?.role === "hospital" && stored.hospitalId) {
+      return [{ id: stored.hospitalId, name: stored.name, email: stored.email }];
+    }
+    return [];
+  });
+
+  // Persist user to localStorage whenever it changes
+  useEffect(() => {
+    if (user) {
+      localStorage.setItem("pulse_user", JSON.stringify(user));
+    } else {
+      localStorage.removeItem("pulse_user");
+      localStorage.removeItem("pulse_token");
+    }
+  }, [user]);
+
+  // On mount: load full data for whichever role's token is stored.
+  useEffect(() => {
+    const stored = readStoredUser();
+    const token  = localStorage.getItem("pulse_token");
+    if (!stored || !token) return;
+
+    if (stored.role === "admin") {
+      getAdminHospitals()
+        .then(list => {
+          setHospitals(list.map(h => ({ id: h._id, _id: h._id, name: h.name, email: h.email })));
+        })
+        .catch(() => { /* silent */ });
+    }
+
+    if (stored.role === "hospital") {
+      getHospitalMe()
+        .then(profile => setHospitalProfile(profile))
+        .catch(() => { /* silent — pages will show auth-stored fallback */ });
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const loginAsAdmin = useCallback(() => {
-    setUser({ role: "admin" });
+  // ── Refresh full hospital profile ──────────────────────────────────────
+  const refreshHospitalProfile = useCallback(async () => {
+    try {
+      const profile = await getHospitalMe();
+      setHospitalProfile(profile);
+      return profile;
+    } catch { return null; }
   }, []);
 
-  const logout = useCallback(() => setUser(null), []);
-
-  const registerHospital = useCallback((data) => {
-    const id = "hsp_" + Math.random().toString(36).slice(2, 8);
-    const newHospital = {
-      id,
-      name: data.name,
-      region: data.region,
-      address: data.address,
-      contactEmail: data.contactEmail,
-      status: "Reporting",
-      completeness: 0,
-      lastActivity: "Just now",
-      registeredAt: new Date().toISOString().slice(0, 10),
+  // ── Hospital login ─────────────────────────────────────────────────────
+  const loginAsHospital = useCallback(async (email, password) => {
+    const data = await hospitalLogin(email, password);
+    localStorage.setItem("pulse_token", data.token);
+    const u = {
+      role: "hospital",
+      hospitalId: data.hospital.id || data.hospital._id,
+      name: data.hospital.name,
+      email: data.hospital.email,
+      blockchainId: data.hospital.blockchainId,
     };
-    setHospitals((prev) => [...prev, newHospital]);
-    setAlertsByHospital((prev) => ({ ...prev, [id]: [] }));
-    setUser({ role: "hospital", hospitalId: id });
-    return newHospital;
+    setUser(u);
+    setHospitals([{ id: u.hospitalId, name: u.name, email: u.email }]);
+    // Eagerly load full profile for all dashboard pages
+    getHospitalMe().then(p => setHospitalProfile(p)).catch(() => {});
+    return u;
   }, []);
 
-  const submitSurveillanceData = useCallback((hospitalId, entry) => {
-    setHospitals((prev) =>
-      prev.map((h) =>
-        h.id === hospitalId
-          ? { ...h, lastActivity: "Just now", completeness: Math.min(100, h.completeness + 2) }
-          : h
-      )
-    );
-    return entry;
+  // ── Admin login ────────────────────────────────────────────────────────
+  const loginAsAdmin = useCallback(async (email, password) => {
+    const data = await adminLogin(email, password);
+    localStorage.setItem("pulse_token", data.token);
+    const u = {
+      role: "admin",
+      name: data.admin.name,
+      email: data.admin.email,
+    };
+    setUser(u);
+
+    // Fetch real hospital list for the admin sidebar
+    try {
+      const list = await getAdminHospitals();
+      setHospitals(list.map(h => ({ id: h._id, _id: h._id, name: h.name, email: h.email })));
+    } catch {
+      setHospitals([]);
+    }
+
+    return u;
   }, []);
 
-  const currentHospital = user?.role === "hospital"
-    ? hospitals.find((h) => h.id === user.hospitalId) || null
-    : null;
+  // ── Logout ─────────────────────────────────────────────────────────────
+  const logout = useCallback(() => {
+    setUser(null);
+    setHospitals([]);
+    setHospitalProfile(null);
+  }, []);
 
-  const currentAlerts = user?.role === "hospital"
-    ? alertsByHospital[user.hospitalId] || []
-    : [];
+  // ── Hospital registration ──────────────────────────────────────────────
+  const registerHospital = useCallback(async (formData) => {
+    // The register endpoint now returns a token + hospital directly
+    const data = await hospitalRegister(formData);
+    localStorage.setItem("pulse_token", data.token);
+    const u = {
+      role: "hospital",
+      hospitalId: data.hospital.id || data.hospital._id,
+      name: data.hospital.name,
+      email: data.hospital.email,
+      blockchainId: data.hospital.blockchainId,
+    };
+    setUser(u);
+    setHospitals([{ id: u.hospitalId, name: u.name, email: u.email }]);
+    // Load full profile after registration
+    getHospitalMe().then(p => setHospitalProfile(p)).catch(() => {});
+    return u;
+  }, []);
+
+  // ── Derived values ─────────────────────────────────────────────────────
+  // Merge auth-stored basics with full profile from backend
+  const currentHospital =
+    user?.role === "hospital"
+      ? {
+          id:           hospitalProfile?._id     || user.hospitalId,
+          name:         hospitalProfile?.name     || user.name,
+          email:        hospitalProfile?.email    || user.email,
+          region:       hospitalProfile?.region   || "—",
+          address:      hospitalProfile?.address  || "",
+          status:       hospitalProfile?.status   || "Reporting",
+          completeness: hospitalProfile?.completeness ?? 0,
+          lastActivity: hospitalProfile?.lastActivity || "—",
+          blockchainId: hospitalProfile?.blockchainId || user?.blockchainId || null,
+          createdAt:    hospitalProfile?.createdAt,
+        }
+      : null;
+
+  // alertsByHospital / submitSurveillanceData kept as stubs so existing
+  // dashboard pages that reference them don't crash
+  const alertsByHospital = {};
+  const currentAlerts = [];
+  const submitSurveillanceData = useCallback(() => {}, []);
 
   const value = {
     user,
+    loading,
     hospitals,
     alertsByHospital,
     currentHospital,
@@ -82,6 +183,7 @@ export function AuthProvider({ children }) {
     logout,
     registerHospital,
     submitSurveillanceData,
+    refreshHospitalProfile,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -1,9 +1,22 @@
 import { NavLink } from "react-router-dom";
 import { Activity, LogOut } from "lucide-react";
 
-export default function Sidebar({ items, roleLabel, roleIcon: RoleIcon, basePath, onLogout, systemStatus }) {
+const AVATAR_TINTS = [
+  "bg-brand-tint text-brand",
+  "bg-indigo-tint text-indigo",
+  "bg-success-tint text-success",
+  "bg-warning-tint text-warning",
+  "bg-cyan-tint text-cyan",
+];
+
+function avatarTint(name = "") {
+  const h = [...name].reduce((s, c) => s + c.charCodeAt(0), 0);
+  return AVATAR_TINTS[h % AVATAR_TINTS.length];
+}
+
+export default function Sidebar({ items, roleLabel, roleIcon: RoleIcon, basePath, onLogout, systemStatus, users = [] }) {
   return (
-    <aside className="h-full min-h-[calc(100vh-120px)] w-full max-w-[280px] flex-shrink-0 rounded-[28px] border border-slate-200/70 bg-white/90 shadow-sm p-5 backdrop-blur-sm flex flex-col overflow-hidden">
+    <aside className="h-screen w-full max-w-[280px] flex-shrink-0 rounded-[28px] border border-slate-200/70 bg-white/90 shadow-sm p-5 backdrop-blur-sm flex flex-col overflow-y-auto sticky top-0">
       <div className="flex items-center gap-3 px-1 pb-5">
         <span className="w-11 h-11 rounded-2xl bg-brand-tint text-brand flex items-center justify-center shadow-sm">
           <Activity size={18} />
@@ -48,6 +61,25 @@ export default function Sidebar({ items, roleLabel, roleIcon: RoleIcon, basePath
             <div className="mt-2 font-semibold text-slate-900">{systemStatus}</div>
           </div>
         )}
+
+        {/* User initials avatars — rendered from the real users prop */}
+        {users.length > 0 && (
+          <div className="flex -space-x-2 overflow-hidden mb-4">
+            {users.slice(0, 5).map((u) => (
+              <span
+                key={u.id || u._id}
+                title={u.name}
+                className={
+                  "w-8 h-8 rounded-full border-2 border-white flex items-center justify-center text-[11px] font-bold flex-shrink-0 " +
+                  avatarTint(u.name || "")
+                }
+              >
+                {(u.name || "?")[0].toUpperCase()}
+              </span>
+            ))}
+          </div>
+        )}
+
         <button className="sidebar-item text-slate-700 hover:bg-slate-50" onClick={onLogout}>
           <LogOut size={16} />
           <span>Log out</span>

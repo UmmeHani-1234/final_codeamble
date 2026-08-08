@@ -3,14 +3,37 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext.jsx";
 
 export default function Login() {
-  const { hospitals, loginAsHospital } = useAuth();
-  const [email, setEmail] = useState("");
+  const { loginAsHospital, loginAsAdmin } = useAuth();
   const navigate = useNavigate();
 
-  function handleSignIn() {
-    if (!hospitals.length) return;
-    loginAsHospital(hospitals[0].id);
-    navigate("/hospital");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+
+  async function handleSignIn(e) {
+    e.preventDefault();
+    if (!email || !password) {
+      setError("Please enter both email and password.");
+      return;
+    }
+    setError("");
+    setLoading(true);
+    try {
+      if (isAdmin) {
+        await loginAsAdmin(email, password);
+        navigate("/admin");
+      } else {
+        await loginAsHospital(email, password);
+        navigate("/hospital");
+      }
+    } catch (err) {
+      setError(err.message || "Login failed. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -23,29 +46,46 @@ export default function Login() {
         body { margin: 0; padding: 0; font-family: 'Inter', sans-serif; background: radial-gradient(120% 120% at 50% 0%, #FFFFFF 0%, #EAF1FE 45%, #CFE0FC 100%); color: #0F172A; }
         .login-frame { width: 100%; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 32px; }
         .frame { width: 100%; max-width: 760px; background: #FFFFFF; border: 1px solid rgba(15,23,42,0.06); border-radius: 24px; box-shadow: 0 30px 80px rgba(30,70,180,0.14), 0 4px 20px rgba(15,23,42,0.04); overflow: hidden; }
-        .topbar { display: flex; align-items: center; gap: 9px; padding: 20px 32px; border-bottom: 1px solid rgba(15,23,42,0.06); }
+        .topbar { padding: 18px 28px; border-bottom: 1px solid rgba(15,23,42,0.06); display: flex; align-items: center; gap: 10px; }
+        .right { position: relative; background: linear-gradient(135deg, #EFF4FF 0%, #E5EDFF 100%); min-height: 480px; }
         .logo-mark { width: 28px; height: 28px; border-radius: 8px; background: linear-gradient(135deg, #2554E8, #6C5CE7); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
         .logo-mark svg { width: 15px; height: 15px; }
         .logo-word { font-size: 17px; font-weight: 700; letter-spacing: -0.01em; }
         .body { display: grid; grid-template-columns: 1fr 1fr; align-items: stretch; }
-        .left { padding: 40px 40px 44px; }
+        .left { padding: 40px 40px 44px; position: relative; }
         h1 { font-size: 26px; font-weight: 800; letter-spacing: -0.02em; margin: 4px 0 6px; }
         .sub { font-size: 13.5px; color: #64748B; margin: 0 0 26px; line-height: 1.5; }
-        .oauth-btn { width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 11px 16px; border: 1px solid rgba(15,23,42,0.12); background: #fff; border-radius: 12px; font-size: 13.5px; font-weight: 600; color: #0F172A; cursor: pointer; margin-bottom: 10px; transition: border-color .15s ease, background .15s ease, transform .15s ease; font-family: inherit; }
-        .oauth-btn:hover { border-color: #2554E8; background: #F7F9FF; transform: translateY(-1px); }
-        .oauth-btn svg { width: 17px; height: 17px; flex-shrink: 0; }
-        .divider { display: flex; align-items: center; gap: 12px; margin: 18px 0 14px; color: #94A0B2; font-size: 11.5px; font-weight: 600; letter-spacing: .03em; text-transform: uppercase; }
+        .divider { display: flex; align-items: center; gap: 12px; margin: 0 0 18px; color: #94A0B2; font-size: 11.5px; font-weight: 600; letter-spacing: .03em; text-transform: uppercase; }
         .divider::before, .divider::after { content: ""; flex: 1; height: 1px; background: rgba(15,23,42,0.08); }
         .field-label { display: block; font-size: 12px; font-weight: 600; color: #475066; margin-bottom: 6px; }
-        .email-input, .sms-input, .email-input:focus, textarea { width: 100%; padding: 11px 13px; border: 1px solid rgba(15,23,42,0.12); border-radius: 12px; font-size: 13.5px; font-family: inherit; color: #0F172A; background: #FBFCFE; margin-bottom: 14px; }
+        .email-input { width: 100%; padding: 11px 13px; border: 1px solid rgba(15,23,42,0.12); border-radius: 12px; font-size: 13.5px; font-family: inherit; color: #0F172A; background: #FBFCFE; margin-bottom: 14px; outline: none; transition: border-color .15s, outline .15s; }
         .email-input::placeholder { color: #94A0B2; }
-        .email-input:focus, textarea:focus { outline: 2px solid #2554E8; outline-offset: 1px; border-color: transparent; }
-        .primary-btn { width: 100%; padding: 11.5px 16px; border: none; border-radius: 12px; background: #2554E8; color: #fff; font-size: 13.5px; font-weight: 700; font-family: inherit; cursor: pointer; box-shadow: 0 8px 20px rgba(37,84,232,0.28); transition: background .15s ease, transform .15s ease; }
-        .primary-btn:hover { background: #1E46CC; transform: translateY(-1px); }
+        .email-input:focus { outline: 2px solid #2554E8; outline-offset: 1px; border-color: transparent; }
+        .email-input.has-error { border-color: #EF4444; }
+        .password-wrap { position: relative; margin-bottom: 14px; }
+        .password-wrap .email-input { margin-bottom: 0; padding-right: 42px; }
+        .pw-toggle { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #94A0B2; padding: 4px; display: flex; align-items: center; }
+        .pw-toggle:hover { color: #475066; }
+        .error-box { background: #FEF2F2; border: 1px solid #FECACA; border-radius: 10px; padding: 10px 12px; margin-bottom: 14px; font-size: 12.5px; color: #DC2626; display: flex; align-items: center; gap: 7px; }
+        .login-mode-toggle { margin-bottom: 18px; display: flex; align-items: center; gap: 8px; }
+        .switch { position: relative; display: inline-block; width: 44px; height: 24px; cursor: pointer; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: #CBD5E1; transition: .3s; border-radius: 24px; cursor: pointer; }
+        .slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 2px; bottom: 2px; background: #fff; transition: .3s; border-radius: 50%; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+        .switch input:checked + .slider { background: #2554E8; }
+        .switch input:checked + .slider:before { transform: translateX(20px); }
+        .mode-label { font-weight: 600; font-size: 13.5px; color: #0F172A; }
+        .primary-btn { width: 100%; padding: 11.5px 16px; border: none; border-radius: 12px; background: #2554E8; color: #fff; font-size: 13.5px; font-weight: 700; font-family: inherit; cursor: pointer; box-shadow: 0 8px 20px rgba(37,84,232,0.28); transition: background .15s ease, transform .15s ease, opacity .15s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .primary-btn:hover:not(:disabled) { background: #1E46CC; transform: translateY(-1px); }
+        .primary-btn:disabled { opacity: 0.65; cursor: not-allowed; transform: none; }
+        .spinner { width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.4); border-top-color: #fff; border-radius: 50%; animation: spin .7s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
         .terms { font-size: 11px; color: #94A0B2; line-height: 1.6; margin-top: 16px; }
         .terms a { color: #2554E8; text-decoration: none; font-weight: 600; }
         .terms a:hover { text-decoration: underline; }
-        .right { position: relative; background: radial-gradient(120% 100% at 100% 0%, #EAF0FE 0%, #F7F9FF 55%, #FFFFFF 100%); border-left: 1px solid rgba(15,23,42,0.06); overflow: hidden; min-height: 380px; }
+        .register-link { margin-top: 14px; font-size: 12.5px; color: #64748B; text-align: center; }
+        .register-link a { color: #2554E8; font-weight: 600; text-decoration: none; }
+        .register-link a:hover { text-decoration: underline; }
         .deco-square { position: absolute; border-radius: 14px; }
         .sq1 { width: 120px; height: 90px; background: #DCE7FE; top: 34px; left: 30px; }
         .sq2 { width: 84px; height: 84px; background: #E9E4FB; top: 150px; right: 24px; }
@@ -62,7 +102,6 @@ export default function Login() {
         .card-text { display: flex; flex-direction: column; gap: 2px; }
         .card-text .t1 { font-size: 11.5px; font-weight: 700; color: #0F172A; }
         .card-text .t2 { font-size: 10px; color: #94A0B2; }
-        .pulse-strip { position: absolute; bottom: 96px; right: 40px; width: 130px; }
         @media (max-width: 640px) { .body { grid-template-columns: 1fr; } .right { min-height: 220px; order: -1; } .left { padding: 32px 26px 34px; } }
       `}</style>
 
@@ -79,38 +118,86 @@ export default function Login() {
 
           <div className="body">
             <div className="left">
-              <h1>Sign up or log in</h1>
-              <p className="sub">Access your hospital or network dashboard on Pulse.</p>
+              <h1>Welcome back</h1>
+              <p className="sub">Sign in to your hospital or network dashboard.</p>
 
-              <button className="oauth-btn" type="button">
-                <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M23.52 12.27c0-.85-.08-1.67-.22-2.45H12v4.64h6.47c-.28 1.5-1.13 2.78-2.4 3.63v3h3.88c2.27-2.09 3.57-5.17 3.57-8.82Z"/><path fill="#34A853" d="M12 24c3.24 0 5.96-1.07 7.95-2.91l-3.88-3c-1.08.72-2.45 1.15-4.07 1.15-3.13 0-5.78-2.11-6.73-4.96H1.27v3.11C3.25 21.3 7.31 24 12 24Z"/><path fill="#FBBC05" d="M5.27 14.28A7.2 7.2 0 0 1 4.89 12c0-.79.14-1.56.38-2.28V6.61H1.27A11.98 11.98 0 0 0 0 12c0 1.93.46 3.76 1.27 5.39l4-3.11Z"/><path fill="#EA4335" d="M12 4.77c1.77 0 3.35.61 4.6 1.8l3.44-3.44C17.95 1.19 15.23 0 12 0 7.31 0 3.25 2.7 1.27 6.61l4 3.11C6.22 6.88 8.87 4.77 12 4.77Z"/></svg>
-                Continue with Google
-              </button>
+              <div className="divider">sign in with email</div>
 
-              <button className="oauth-btn" type="button">
-                <svg viewBox="0 0 23 23"><rect width="10" height="10" x="0" y="0" fill="#F35325"/><rect width="10" height="10" x="12" y="0" fill="#81BC06"/><rect width="10" height="10" x="0" y="12" fill="#05A6F0"/><rect width="10" height="10" x="12" y="12" fill="#FFBA08"/></svg>
-                Continue with Microsoft
-              </button>
+              <form onSubmit={handleSignIn} noValidate>
+                <label className="field-label" htmlFor="email">Work email</label>
+                <input
+                  className={`email-input${error ? " has-error" : ""}`}
+                  id="email"
+                  type="email"
+                  placeholder="you@yourhospital.org"
+                  value={email}
+                  onChange={(e) => { setEmail(e.target.value); setError(""); }}
+                  autoComplete="email"
+                  disabled={loading}
+                />
 
-              <div className="divider">or</div>
+                <label className="field-label" htmlFor="password">Password</label>
+                <div className="password-wrap">
+                  <input
+                    className={`email-input${error ? " has-error" : ""}`}
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    placeholder="••••••••"
+                    value={password}
+                    onChange={(e) => { setPassword(e.target.value); setError(""); }}
+                    autoComplete="current-password"
+                    disabled={loading}
+                  />
+                  <button
+                    type="button"
+                    className="pw-toggle"
+                    onClick={() => setShowPassword((v) => !v)}
+                    aria-label={showPassword ? "Hide password" : "Show password"}
+                  >
+                    {showPassword ? (
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+                        <line x1="1" y1="1" x2="23" y2="23"/>
+                      </svg>
+                    ) : (
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                        <circle cx="12" cy="12" r="3"/>
+                      </svg>
+                    )}
+                  </button>
+                </div>
 
-              <label className="field-label" htmlFor="email">Work email</label>
-              <input
-                className="email-input"
-                id="email"
-                type="email"
-                placeholder="you@yourhospital.org"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
+                {error && (
+                  <div className="error-box" role="alert">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+                    </svg>
+                    {error}
+                  </div>
+                )}
 
-              <button className="primary-btn" type="button" onClick={handleSignIn}>
-                Continue with email
-              </button>
+                <div className="login-mode-toggle">
+                  <span className="field-label" style={{ marginBottom: 0 }}>Login as</span>
+                  <label className="switch" style={{ marginLeft: 8 }}>
+                    <input type="checkbox" checked={isAdmin} onChange={(e) => { setIsAdmin(e.target.checked); setError(""); }} />
+                    <span className="slider"></span>
+                  </label>
+                  <span className="mode-label" style={{ marginLeft: 8 }}>{isAdmin ? "Admin" : "Hospital"}</span>
+                </div>
+
+                <button className="primary-btn" type="submit" id="login-submit-btn" disabled={loading}>
+                  {loading ? <><span className="spinner" /> Signing in…</> : "Sign in"}
+                </button>
+              </form>
+
+              <p className="register-link">
+                New hospital? <Link to="/register">Create an account</Link>
+              </p>
 
               <p className="terms">
-                By continuing with Google, Microsoft, or email, you agree to Pulse's
-                <a href="#"> Terms of Service</a> and <a href="#"> Privacy Policy</a>.
+                By signing in you agree to Pulse's{" "}
+                <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.
               </p>
             </div>
 

@@ -14,7 +14,7 @@ function avatarTint(label = "") {
 
 export default function TopHeader({ title, avatarLabel = "P" }) {
   return (
-    <header className="sticky top-0 z-20 bg-white/80 backdrop-blur border-b border-slate-200">
+    <header className="sticky top-0 z-20 bg-gradient-to-r from-brand/10 via-indigo-50 to-purple-50 backdrop-blur border-b border-slate-200">
       <div className="mx-auto flex h-16 max-w-[1600px] items-center justify-between px-5 sm:px-8">
         <div>
           <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">Dashboard</p>

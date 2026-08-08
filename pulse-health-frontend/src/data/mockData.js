@@ -169,6 +169,7 @@ export const notificationUsers = [
     name: "Dr. Maya Deshpande",
     role: "Hospital Admin",
     email: "admin@stxaviergeneral.org",
+    avatar: "/avatars/default.jpg",
     hospitalId: "hsp_001",
   },
   {
@@ -176,6 +177,7 @@ export const notificationUsers = [
     name: "Mr. Anand Patil",
     role: "Surveillance Lead",
     email: "ops@thanecivic.org",
+    avatar: "/avatars/default.jpg",
     hospitalId: "hsp_002",
   },
   {
@@ -183,6 +185,7 @@ export const notificationUsers = [
     name: "Dr. Sanya Rao",
     role: "Clinical Director",
     email: "info@nmcarecenter.org",
+    avatar: "/avatars/default.jpg",
     hospitalId: "hsp_003",
   },
   {
@@ -190,6 +193,7 @@ export const notificationUsers = [
     name: "Ms. Priya Nair",
     role: "Nurse Manager",
     email: "surveillance@punemetro.org",
+    avatar: "/avatars/default.jpg",
     hospitalId: "hsp_004",
   },
   {
@@ -197,6 +201,7 @@ export const notificationUsers = [
     name: "Mr. Rohit Sharma",
     role: "Outbreak Response",
     email: "contact@nashikregional.org",
+    avatar: "/avatars/default.jpg",
     hospitalId: "hsp_005",
   },
   {
@@ -204,6 +209,7 @@ export const notificationUsers = [
     name: "Ms. Leena Kulkarni",
     role: "Network Operations",
     email: "ops@healthnet.org",
+    avatar: "/avatars/default.jpg",
     hospitalId: null,
   },
   {
@@ -211,9 +217,63 @@ export const notificationUsers = [
     name: "Mr. Rohan Joshi",
     role: "Public Health Analyst",
     email: "alerts@healthnet.org",
+    avatar: "/avatars/default.jpg",
     hospitalId: null,
   },
-];
+    {
+      id: "usr_008",
+      name: "Dr. Aisha Khan",
+      role: "Epidemiology Lead",
+      email: "lead@stxaviergeneral.org",
+    avatar: "/avatars/default.jpg",
+      hospitalId: "hsp_001",
+    },
+    {
+      id: "usr_009",
+      name: "Mr. Vikram Singh",
+      role: "Data Analyst",
+      email: "analytics@thanecivic.org",
+    avatar: "/avatars/default.jpg",
+      hospitalId: "hsp_002",
+    },
+    {
+      id: "usr_010",
+      name: "Ms. Priya Sharma",
+      role: "Public Relations",
+      email: "pr@nmcarecenter.org",
+    avatar: "/avatars/default.jpg",
+      hospitalId: "hsp_003",
+    },
+    {
+      id: "usr_011",
+      name: "Dr. Rahul Mehta",
+      role: "Infection Control",
+      email: "infection@punemetro.org",
+    avatar: "/avatars/default.jpg",
+      hospitalId: "hsp_004",
+    },
+    {
+      id: "usr_012",
+      name: "Ms. Ananya Patel",
+      role: "Logistics Coordinator",
+      email: "logistics@aurangabad.org",
+      hospitalId: "hsp_006",
+    },
+    {
+      id: "usr_013",
+      name: "Mr. Sameer Joshi",
+      role: "Research Scientist",
+      email: "research@kolhapurclinic.org",
+      hospitalId: "hsp_008",
+    },
+    {
+      id: "usr_014",
+      name: "Dr. Neha Singh",
+      role: "Chief Medical Officer",
+      email: "cmo@stxaviergeneral.org",
+      hospitalId: "hsp_001",
+    },
+  ];
 
 export function flattenAllAlerts(hospitals, alertsByHospital) {
   const hospitalById = Object.fromEntries(hospitals.map((h) => [h.id, h]));

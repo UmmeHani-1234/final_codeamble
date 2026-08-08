@@ -26,6 +26,7 @@ const AdminRegional = lazy(() => import("./pages/admin/Regional.jsx"));
 const AdminOrganizations = lazy(() => import("./pages/admin/Organizations.jsx"));
 const AdminHistory = lazy(() => import("./pages/admin/History.jsx"));
 const AdminNotifications = lazy(() => import("./pages/admin/Notifications.jsx"));
+const AdminSubmissions = lazy(() => import("./pages/admin/Submissions.jsx"));
 const AdminSettings = lazy(() => import("./pages/admin/Settings.jsx"));
 
 const hospitalNav = [
@@ -42,13 +43,14 @@ const hospitalNav = [
 ];
 
 const adminNav = [
-  { key: "", label: "Overview", icon: HomeIcon },
-  { key: "alerts", label: "All Alerts", icon: AlertTriangle },
-  { key: "regional", label: "Regional View", icon: MapPin },
-  { key: "organizations", label: "Organizations", icon: Building2 },
-  { key: "history", label: "History & Reports", icon: Clock },
-  { key: "notifications", label: "Notifications", icon: Bell },
-  { key: "settings", label: "Settings", icon: Settings },
+  { key: "",             label: "Overview",         icon: HomeIcon },
+  { key: "alerts",       label: "All Alerts",        icon: AlertTriangle },
+  { key: "regional",     label: "Regional View",     icon: MapPin },
+  { key: "organizations",label: "Organizations",     icon: Building2 },
+  { key: "submissions",  label: "Submissions",       icon: ClipboardList },
+  { key: "history",      label: "History & Reports", icon: Clock },
+  { key: "notifications",label: "Notifications",     icon: Bell },
+  { key: "settings",     label: "Settings",          icon: Settings },
 ];
 
 function HospitalDashboardLayout() {
@@ -141,12 +143,13 @@ export default function App() {
         }
       >
         <Route index element={<AdminOverview />} />
-        <Route path="alerts" element={<AdminAlerts />} />
-        <Route path="regional" element={<AdminRegional />} />
+        <Route path="alerts"        element={<AdminAlerts />} />
+        <Route path="regional"      element={<AdminRegional />} />
         <Route path="organizations" element={<AdminOrganizations />} />
-        <Route path="history" element={<AdminHistory />} />
+        <Route path="submissions"   element={<AdminSubmissions />} />
+        <Route path="history"       element={<AdminHistory />} />
         <Route path="notifications" element={<AdminNotifications />} />
-        <Route path="settings" element={<AdminSettings />} />
+        <Route path="settings"      element={<AdminSettings />} />
       </Route>
       </Routes>
     </Suspense>

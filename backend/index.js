@@ -7,16 +7,26 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: ['http://localhost:5173', 'http://localhost:5174'],
+  credentials: true,
+}));
 app.use(express.json());
 
 // Routes
+const authRoutes        = require('./routes/auth');
+const metricsRoutes     = require('./routes/metrics');
+const adminAuthRoutes   = require('./routes/adminAuth');
 const hospitalAuthRoutes = require('./routes/hospitalAuth');
-const adminRoutes = require('./routes/admin');
-const metricsRoutes = require('./routes/metrics');
-app.use('/api/hospital', hospitalAuthRoutes);
-app.use('/api/admin', adminRoutes);
-app.use('/api/metrics', metricsRoutes);
+const hospitalRoutes    = require('./routes/hospital');
+const adminRoutes       = require('./routes/admin');
+
+app.use('/api/auth',          authRoutes);
+app.use('/api/metrics',       metricsRoutes);
+app.use('/api/admin/auth',    adminAuthRoutes);
+app.use('/api/hospital/auth', hospitalAuthRoutes);
+app.use('/api/hospital',      hospitalRoutes);
+app.use('/api/admin',         adminRoutes);
 
 // Basic route for testing
 app.get('/', (req, res) => {
