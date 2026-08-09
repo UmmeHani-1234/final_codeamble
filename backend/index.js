@@ -16,8 +16,17 @@ const configuredOrigins = process.env.CORS_ORIGINS
   ? process.env.CORS_ORIGINS.split(',').map((s) => s.trim()).filter(Boolean)
   : [];
 const corsOrigins = Array.from(new Set([...defaultOrigins, ...configuredOrigins]));
-app.use(cors({ origin: corsOrigins, credentials: true }));
+
 app.use(express.json());
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true);
+    if (corsOrigins.includes(origin)) return callback(null, true);
+    return callback(new Error('CORS policy: origin not allowed'));
+  },
+  credentials: true,
+  exposedHeaders: ['Access-Control-Allow-Origin', 'Access-Control-Allow-Credentials'],
+}));
 
 // Routes
 const authRoutes        = require('./routes/auth');
