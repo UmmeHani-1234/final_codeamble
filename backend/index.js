@@ -7,10 +7,11 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middleware
-app.use(cors({
-  origin: ['http://localhost:5173', 'http://localhost:5174'],
-  credentials: true,
-}));
+// Allow configuring CORS origins via env var `CORS_ORIGINS` (comma-separated)
+const corsOrigins = process.env.CORS_ORIGINS
+  ? process.env.CORS_ORIGINS.split(',').map(s => s.trim()).filter(Boolean)
+  : ['http://localhost:5173', 'http://localhost:5174'];
+app.use(cors({ origin: corsOrigins, credentials: true }));
 app.use(express.json());
 
 // Routes
