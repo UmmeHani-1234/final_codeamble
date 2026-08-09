@@ -7,10 +7,15 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middleware
-// Allow configuring CORS origins via env var `CORS_ORIGINS` (comma-separated)
-const corsOrigins = process.env.CORS_ORIGINS
-  ? process.env.CORS_ORIGINS.split(',').map(s => s.trim()).filter(Boolean)
-  : ['http://localhost:5173', 'http://localhost:5174'];
+// Allow configuring CORS origins via env vars: FRONTEND_URL and/or CORS_ORIGINS.
+const defaultOrigins = ['http://localhost:5173', 'http://localhost:5174'];
+if (process.env.FRONTEND_URL) {
+  defaultOrigins.push(process.env.FRONTEND_URL.trim());
+}
+const configuredOrigins = process.env.CORS_ORIGINS
+  ? process.env.CORS_ORIGINS.split(',').map((s) => s.trim()).filter(Boolean)
+  : [];
+const corsOrigins = Array.from(new Set([...defaultOrigins, ...configuredOrigins]));
 app.use(cors({ origin: corsOrigins, credentials: true }));
 app.use(express.json());
 

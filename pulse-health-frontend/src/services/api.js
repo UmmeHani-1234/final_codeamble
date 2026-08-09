@@ -1,7 +1,8 @@
 // src/services/api.js
 // Centralised fetch wrapper for all backend calls.
 
-const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+// Default to the deployed Render backend if `VITE_API_URL` is not set
+const BASE_URL = import.meta.env.VITE_API_URL || 'https://final-codeamble.onrender.com';
 
 function notifySharedUpdate(type, payload = {}) {
   const eventPayload = { type, source: 'pulse-sync', timestamp: Date.now(), ...payload };
@@ -21,7 +22,12 @@ async function request(path, options = {}) {
     ...(options.headers || {}),
   };
 
-  const res = await fetch(`${BASE_URL}${path}`, { ...options, headers });
+  let res;
+  try {
+    res = await fetch(`${BASE_URL}${path}`, { ...options, headers });
+  } catch (err) {
+    throw new Error('Unable to connect to the server. Please check your network or backend URL.');
+  }
 
   let data;
   try { data = await res.json(); } catch { data = {}; }

@@ -84,7 +84,7 @@ export default function AdminSettings() {
         </div>
         <div className="flex flex-col gap-3.5">
           <Field label="Platform"    value="Pulse Health — Epidemic Early Warning" />
-          <Field label="API base"    value={import.meta.env.VITE_API_URL || "http://localhost:5000"} />
+          <Field label="API base"    value={import.meta.env.VITE_API_URL || "Not configured"} />
           <Field label="Environment" value={import.meta.env.MODE || "development"} />
         </div>
         <p className="text-muted text-[12.5px] mt-4">
