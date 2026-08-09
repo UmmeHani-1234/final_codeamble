@@ -83,6 +83,7 @@ router.post('/register', async (req, res) => {
       }),
       NotificationUser.create({
         hospitalId: hospital._id,
+        hospitalName: hospital.name,
         name: `${hospital.name.split(' ')[0] || 'Hospital'} Operations Lead`,
         email: `${slugify(hospital.name)}+${hospital._id.toString().slice(-4)}@pulsehealth.local`,
         role: 'Hospital Admin',
